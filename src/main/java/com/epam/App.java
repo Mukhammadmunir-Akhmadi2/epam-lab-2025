@@ -1,8 +1,9 @@
 package com.epam;
 
+import com.epam.application.repository.TraineeRepository;
+import com.epam.application.repository.TrainerRepository;
+import com.epam.application.repository.TrainingRepository;
 import com.epam.application.services.TraineeService;
-import com.epam.application.services.TrainerService;
-import com.epam.application.services.TrainingService;
 import com.epam.infrastructure.config.AppConfig;
 import com.epam.model.Trainee;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -15,18 +16,19 @@ public class App {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 
         try {
-            TrainingService trainingService = context.getBean(TrainingService.class);
+            TrainingRepository trainingRepository = context.getBean(TrainingRepository.class);
+            TraineeRepository traineeRepository = context.getBean(TraineeRepository.class);
             TraineeService traineeService = context.getBean(TraineeService.class);
-            TrainerService trainerService = context.getBean(TrainerService.class);
+            TrainerRepository trainerRepository= context.getBean(TrainerRepository.class);
 
             System.out.println("\n=== Existing Trainees ===");
-            traineeService.getAllTrainees().forEach(System.out::println);
+            traineeRepository.findAll().forEach(System.out::println);
 
             System.out.println("\n=== Existing Trainers ===");
-            trainerService.getAllTrainers().forEach(System.out::println);
+            trainerRepository.findAll().forEach(System.out::println);
 
             System.out.println("\n=== Existing Trainings ===");
-            trainingService.getAllTrainings().forEach(System.out::println);
+            trainingRepository.findAll().forEach(System.out::println);
 
             System.out.println("\n=== New Trainee Saved ===");
             Trainee newTrainee = new Trainee();
@@ -42,7 +44,7 @@ public class App {
             traineeService.deleteTrainee(savedTrainee.getUserId().toString());
 
             System.out.println("\n=== Trainees after removal ===");
-            traineeService.getAllTrainees().forEach(System.out::println);
+            traineeRepository.findAll().forEach(System.out::println);
         } finally {
             context.close();
         }

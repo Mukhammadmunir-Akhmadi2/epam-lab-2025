@@ -24,7 +24,6 @@ public class StoragePersistence {
     @PreDestroy
     public void persistAll() {
         logger.info("Persisting all @MapStorage beans before shutdown...");
-        System.out.println("Persisting all @MapStorage beans before shutdown...");
 
         String basePath = dataFolder + "/";
 
@@ -40,11 +39,8 @@ public class StoragePersistence {
                     Object data = storageField.get(bean);
                     mapper.writerWithDefaultPrettyPrinter().writeValue(new File(path), data);
                     logger.info("Persisted {}", path);
-                    System.out.println("Persisted " + path);
                 }
             } catch (Exception e) {
-                System.out.printf("Failed to persist " + path);
-                System.out.println(e.getMessage());
                 logger.error("Failed to persist {}", path, e);
             }
         });

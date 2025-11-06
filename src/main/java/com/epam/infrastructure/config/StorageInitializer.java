@@ -50,16 +50,12 @@ public class StorageInitializer implements BeanPostProcessor {
                     Object data = mapper.readValue(inputStream, typeRef);
 
                     storageField.set(bean, data);
-                    logger.info("Loaded data from {} into {}", file, beanName);
-                    System.out.println("Loaded data from " + file + " into " + beanName);
-                }
+                    logger.info("Loaded data from {} into {}", file, beanName);}
 
             } catch (NoSuchFieldException e) {
                 logger.warn("'storage' field not found in {}. Skipping initialization.", beanName);
             } catch (Exception e) {
                 logger.error("Failed to initialize {} from {}", beanName, path);
-                System.out.printf("Failed to initialize " + beanName + " from " + path);
-                System.out.println(e.getMessage());
             }
         }
         return bean;

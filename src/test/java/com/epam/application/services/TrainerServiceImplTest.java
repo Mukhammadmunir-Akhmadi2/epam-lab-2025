@@ -97,11 +97,4 @@ class TrainerServiceImplTest {
         when(trainerRepository.findByUserName("username")).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> trainerService.getTrainerByUserName("username"));
     }
-
-    @Test
-    void testGetAllTrainersEmpty() {
-        when(trainerRepository.findAll()).thenReturn(List.of());
-        List<Trainer> result = trainerService.getAllTrainers();
-        assertTrue(result.isEmpty());
-    }
 }

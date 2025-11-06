@@ -92,20 +92,7 @@ class TraineeServiceImplTest {
     }
 
     @Test
-    void testDeleteTraineeSoftDelete() {
-        defaultTrainee.setActive(true);
-        when(traineeRepository.findById(defaultTrainee.getUserId().toString()))
-                .thenReturn(Optional.of(defaultTrainee));
-
-        traineeService.deleteTrainee(defaultTrainee.getUserId().toString());
-
-        assertFalse(defaultTrainee.isActive());
-        verify(traineeRepository, times(1)).save(defaultTrainee);
-    }
-
-    @Test
-    void testDeleteTraineePermanentDelete() {
-        defaultTrainee.setActive(false);
+    void testTraineePermanentDelete() {
         when(traineeRepository.findById(defaultTrainee.getUserId().toString()))
                 .thenReturn(Optional.of(defaultTrainee));
 
@@ -125,12 +112,5 @@ class TraineeServiceImplTest {
     void testGetTraineeByUserNameNotFound() {
         when(traineeRepository.findByUserName("username")).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> traineeService.getTraineeByUserName("username"));
-    }
-
-    @Test
-    void testGetAllTraineesEmpty() {
-        when(traineeRepository.findAll()).thenReturn(List.of());
-        List<Trainee> result = traineeService.getAllTrainees();
-        assertTrue(result.isEmpty());
     }
 }

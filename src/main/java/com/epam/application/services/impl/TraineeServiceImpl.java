@@ -11,9 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class TraineeServiceImpl implements TraineeService {
@@ -36,7 +33,6 @@ public class TraineeServiceImpl implements TraineeService {
 
         Trainee saved = traineeRepository.save(trainee);
         log.info("Created trainee id={} username={}", saved.getUserId(), saved.getUserName());
-        System.out.println("Created trainee with username: " + username + " and password: " + password);
         return saved;
     }
 
@@ -58,7 +54,6 @@ public class TraineeServiceImpl implements TraineeService {
             );
             existing.setUserName(newUsername);
             log.info("Username regenerated for trainee id={} -> {}", existing.getUserId(), newUsername);
-            System.out.println("Username regenerated for trainee id=" + existing.getUserId() + " -> " + newUsername);
         }
 
         existing.setDateOfBirth(trainee.getDateOfBirth());
@@ -73,20 +68,8 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public void deleteTrainee(String traineeId) {
-        Trainee trainee = traineeRepository.findById(traineeId)
-                .orElseThrow(() -> new UserNotFoundException("Trainee not found id=" + traineeId));
-        if (trainee.isActive()) {
-            trainee.setActive(false);
-            log.info("Soft deleted trainee id={}", traineeId);
-            System.out.println("Soft deleted trainee id=" + traineeId);
-        } else {
-            traineeRepository.delete(traineeId);
-            log.info("Permanently deleted trainee id={}", traineeId);
-            System.out.println("Permanently deleted trainee id=" + traineeId);
-            return;
-        }
-
-        traineeRepository.save(trainee);
+        traineeRepository.delete(traineeId);
+        log.info("Permanently deleted trainee id={}", traineeId);
     }
 
     @Override
@@ -102,11 +85,5 @@ public class TraineeServiceImpl implements TraineeService {
                 .orElseThrow(() ->
                         new UserNotFoundException("Trainee not found username=" + username)
                 );
-    }
-
-    @Override
-    public List<Trainee> getAllTrainees() {
-        List<Trainee> trainees = traineeRepository.findAll();
-        return trainees.isEmpty() ? new ArrayList<>() : trainees;
     }
 }

@@ -1,7 +1,11 @@
 package com.epam.model;
 
 import com.epam.infrastructure.enums.TrainingType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor

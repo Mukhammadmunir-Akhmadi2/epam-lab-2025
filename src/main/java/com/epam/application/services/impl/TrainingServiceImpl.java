@@ -23,7 +23,6 @@ public class TrainingServiceImpl implements TrainingService {
     public Training createTraining(Training training) {
         Training saved = trainingRepository.save(training);
         log.info("Created training id={} name={}", saved.getTrainingId(), saved.getTrainingName());
-        System.out.println("Created training with id: " + saved.getTrainingId());
         return saved;
     }
 

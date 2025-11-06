@@ -10,10 +10,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public abstract class User {
-    private UUID userId;
-    private String firstName;
-    private String lastName;
-    private String userName;
-    private String password;
-    private boolean isActive;
+    protected UUID userId;
+    protected String firstName;
+    protected String lastName;
+    protected String userName;
+    protected String password;
+    protected boolean isActive;
 }

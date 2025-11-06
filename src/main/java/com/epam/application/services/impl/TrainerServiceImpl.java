@@ -11,9 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class TrainerServiceImpl implements TrainerService {
@@ -76,11 +73,5 @@ public class TrainerServiceImpl implements TrainerService {
     public Trainer getTrainerByUserName(String username) {
         return trainerRepository.findByUserName(username)
                 .orElseThrow(() -> new UserNotFoundException("Trainer not found username=" + username));
-    }
-
-    @Override
-    public List<Trainer> getAllTrainers() {
-        List<Trainer> trainers = trainerRepository.findAll();
-        return trainers.isEmpty() ? new ArrayList<>() : trainers;
     }
 }
