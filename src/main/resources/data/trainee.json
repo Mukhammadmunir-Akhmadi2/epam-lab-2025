@@ -1,0 +1,72 @@
+{
+  "c9e2a8a1-1f3d-4b70-8e3e-9b9fda3f8b11" : {
+    "userId" : "c9e2a8a1-1f3d-4b70-8e3e-9b9fda3f8b11",
+    "firstName" : "Alice",
+    "lastName" : "Brown",
+    "userName" : "Alice.Brown",
+    "password" : "pass123",
+    "dateOfBirth" : "1998-06-12",
+    "address" : "123 Maple Street",
+    "active" : true
+  },
+  "b7f41b73-5b84-4cc5-b7a2-1f0b3ef4d8f3" : {
+    "userId" : "b7f41b73-5b84-4cc5-b7a2-1f0b3ef4d8f3",
+    "firstName" : "Bob",
+    "lastName" : "Johnson",
+    "userName" : "Bob.Johnson",
+    "password" : "secret456",
+    "dateOfBirth" : "1995-03-22",
+    "address" : "45 Oak Avenue",
+    "active" : true
+  },
+  "e1c5a65b-8b9c-4f94-a1e1-0b6f4df4e9b8" : {
+    "userId" : "e1c5a65b-8b9c-4f94-a1e1-0b6f4df4e9b8",
+    "firstName" : "Clara",
+    "lastName" : "Mills",
+    "userName" : "Clara.Mills",
+    "password" : "pw789",
+    "dateOfBirth" : "2000-09-01",
+    "address" : "12 Hillcrest Blvd",
+    "active" : false
+  },
+  "a32d84f4-923f-4b87-918c-26cf5d2f9c01" : {
+    "userId" : "a32d84f4-923f-4b87-918c-26cf5d2f9c01",
+    "firstName" : "David",
+    "lastName" : "Smith",
+    "userName" : "David.Smith",
+    "password" : "abc123",
+    "dateOfBirth" : "1993-07-14",
+    "address" : "22 Forest Lane",
+    "active" : true
+  },
+  "6f41b073-57c3-4e94-a4e3-2f8b6d91f913" : {
+    "userId" : "6f41b073-57c3-4e94-a4e3-2f8b6d91f913",
+    "firstName" : "Ella",
+    "lastName" : "Davis",
+    "userName" : "Ella.Davis",
+    "password" : "qwerty",
+    "dateOfBirth" : "1999-02-17",
+    "address" : "9 River Street",
+    "active" : true
+  },
+  "b74d8cfb-baa1-4316-bdde-6297cfe0b2d0" : {
+    "userId" : "b74d8cfb-baa1-4316-bdde-6297cfe0b2d0",
+    "firstName" : "John",
+    "lastName" : "Doe",
+    "userName" : "John.Doe",
+    "password" : "BJA3yvQanj",
+    "dateOfBirth" : "1999-06-06",
+    "address" : "123 Main St, Anytown, USA",
+    "active" : false
+  },
+  "eb9044ee-d934-463e-99aa-6272823c5b09" : {
+    "userId" : "eb9044ee-d934-463e-99aa-6272823c5b09",
+    "firstName" : "John",
+    "lastName" : "Doe",
+    "userName" : "John.Doe1",
+    "password" : "Jm3@t98jsM",
+    "dateOfBirth" : "1999-06-06",
+    "address" : "123 Main St, Anytown, USA",
+    "active" : false
+  }
+}
