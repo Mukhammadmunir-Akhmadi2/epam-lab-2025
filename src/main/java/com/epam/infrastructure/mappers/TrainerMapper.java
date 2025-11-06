@@ -12,10 +12,10 @@ import java.util.List;
 public interface TrainerMapper {
     TrainerMapper INSTANCE = Mappers.getMapper(TrainerMapper.class);
 
-    @Mapping(source = "userId", target = "userId", qualifiedByName = "stringToUuid")
+    @Mapping(source = "userId", target = "userId", qualifiedByName = "uuidToString")
     Trainer toModel(TrainerDao trainerDao);
 
-    @Mapping(source = "userId", target = "userId", qualifiedByName = "uuidToString")
+    @Mapping(source = "userId", target = "userId", qualifiedByName = "stringToUuid")
     TrainerDao toDao(Trainer trainer);
 
     List<Trainer> toModelList(List<TrainerDao> trainers);

@@ -24,13 +24,13 @@ public class InMemoryTraineeRepository implements TraineeRepository {
     @Override
     public Trainee save(Trainee trainee) {
         if (trainee.getUserId() == null) {
-            trainee.setUserId(UUID.randomUUID());
+            trainee.setUserId(UUID.randomUUID().toString());
         }
         storage.put(
-                trainee.getUserId().toString(),
+                trainee.getUserId(),
                 traineeMapper.toDao(trainee)
         );
-        return traineeMapper.toModel(storage.get(trainee.getUserId().toString()));
+        return traineeMapper.toModel(storage.get(trainee.getUserId()));
     }
 
     @Override

@@ -6,11 +6,15 @@ import com.epam.application.repository.TrainingRepository;
 import com.epam.application.services.TraineeService;
 import com.epam.infrastructure.config.AppConfig;
 import com.epam.model.Trainee;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.LocalDate;
 
 public class App {
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
+
     public static void main( String[] args ) {
         // for testing purposes
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
@@ -21,16 +25,19 @@ public class App {
             TraineeService traineeService = context.getBean(TraineeService.class);
             TrainerRepository trainerRepository= context.getBean(TrainerRepository.class);
 
-            System.out.println("\n=== Existing Trainees ===");
-            traineeRepository.findAll().forEach(System.out::println);
 
-            System.out.println("\n=== Existing Trainers ===");
-            trainerRepository.findAll().forEach(System.out::println);
+            logger.info("Listing all existing trainees:");
+            traineeRepository.findAll().forEach(t -> logger.info("{}", t));
 
-            System.out.println("\n=== Existing Trainings ===");
-            trainingRepository.findAll().forEach(System.out::println);
+            logger.info("Listing all existing trainers:");
+            trainerRepository.findAll().forEach(t -> logger.info("{}", t));
 
-            System.out.println("\n=== New Trainee Saved ===");
+
+            logger.info("Listing all existing trainings:");
+            trainingRepository.findAll().forEach(t -> logger.info("{}", t));
+
+
+            logger.info("Saving new trainee:");
             Trainee newTrainee = new Trainee();
             newTrainee.setFirstName("John");
             newTrainee.setLastName("Doe");
@@ -38,13 +45,13 @@ public class App {
             newTrainee.setAddress("123 Main St, Anytown, USA");
             Trainee savedTrainee = traineeService.createTrainee(newTrainee);
 
-            System.out.println(savedTrainee);
+            logger.info("{}", savedTrainee);
 
-            System.out.println("\n=== Remove trainee ===");
-            traineeService.deleteTrainee(savedTrainee.getUserId().toString());
+            logger.info("Removing trainee:");
+            traineeService.deleteTrainee(savedTrainee.getUserId());
 
-            System.out.println("\n=== Trainees after removal ===");
-            traineeRepository.findAll().forEach(System.out::println);
+            logger.info("Listing all existing trainees after removal:");
+            logger.info("{}", traineeRepository.findAll());
         } finally {
             context.close();
         }

@@ -41,7 +41,7 @@ class TraineeServiceImplTest {
         MockitoAnnotations.openMocks(this);
 
         defaultTrainee = new Trainee();
-        defaultTrainee.setUserId(UUID.randomUUID());
+        defaultTrainee.setUserId(UUID.randomUUID().toString());
         defaultTrainee.setFirstName("Alice");
         defaultTrainee.setLastName("Smith");
         defaultTrainee.setDateOfBirth(LocalDate.of(2000, 1, 1));

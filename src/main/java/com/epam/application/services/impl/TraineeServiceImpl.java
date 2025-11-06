@@ -38,16 +38,16 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee updateTrainee(Trainee trainee) {
-        Trainee existing = traineeRepository.findById(trainee.getUserId().toString())
-                .orElseThrow(() -> new UserNotFoundException("Trainee not found id=" + trainee.getUserId()));
+        Trainee existing = traineeRepository.findById(trainee.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("Trainee", trainee.getUserId()));
 
-        boolean nameChanged = !existing.getFirstName().equals(trainee.getFirstName())
+        boolean isNameChanged = !existing.getFirstName().equals(trainee.getFirstName())
                 || !existing.getLastName().equals(trainee.getLastName());
 
         existing.setFirstName(trainee.getFirstName());
         existing.setLastName(trainee.getLastName());
 
-        if (nameChanged) {
+        if (isNameChanged) {
             String newUsername = usernameGenerator.generateUsername(
                     existing,
                     name -> traineeRepository.findByUserName(name).isPresent()
@@ -75,7 +75,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public Trainee getTraineeById(String traineeId) {
         return traineeRepository.findById(traineeId).orElseThrow(() ->
-                new UserNotFoundException("Trainee not found id=" + traineeId)
+                new UserNotFoundException("Trainee", traineeId)
         );
     }
 

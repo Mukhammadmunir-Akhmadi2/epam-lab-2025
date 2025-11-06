@@ -41,7 +41,7 @@ class TrainerServiceImplTest {
         MockitoAnnotations.openMocks(this);
 
         trainer = new Trainer();
-        trainer.setUserId(UUID.randomUUID());
+        trainer.setUserId(UUID.randomUUID().toString());
         trainer.setFirstName("Alice");
         trainer.setLastName("Smith");
         trainer.setSpecialization(TrainingType.YOGA);

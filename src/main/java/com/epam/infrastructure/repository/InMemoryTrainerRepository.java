@@ -24,15 +24,15 @@ public class InMemoryTrainerRepository implements TrainerRepository {
     @Override
     public Trainer save(Trainer trainer) {
         if (trainer.getUserId() == null) {
-            trainer.setUserId(UUID.randomUUID());
+            trainer.setUserId(UUID.randomUUID().toString());
         }
 
         storage.put(
-                trainer.getUserId().toString(),
+                trainer.getUserId(),
                 trainerMapper.toDao(trainer)
         );
 
-        return trainerMapper.toModel(storage.get(trainer.getUserId().toString()));
+        return trainerMapper.toModel(storage.get(trainer.getUserId()));
     }
 
     @Override

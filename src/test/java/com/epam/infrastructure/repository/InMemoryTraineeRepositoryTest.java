@@ -23,7 +23,7 @@ public class InMemoryTraineeRepositoryTest {
         Map<String, TraineeDao> initialStorage = new HashMap<>();
 
         Trainee trainee = new Trainee();
-        trainee.setUserId(UUID.randomUUID());
+        trainee.setUserId(UUID.randomUUID().toString());
         trainee.setFirstName("Alice");
         trainee.setLastName("Smith");
         trainee.setUserName("Alice" + "." + "Smith");

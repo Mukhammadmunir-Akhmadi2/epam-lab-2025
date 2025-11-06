@@ -39,10 +39,10 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer updateTrainer(Trainer trainer) {
-        Trainer existing = trainerRepository.findById(trainer.getUserId().toString())
-                .orElseThrow(() -> new UserNotFoundException("Trainer not found id=" + trainer.getUserId()));
+        Trainer existing = trainerRepository.findById(trainer.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("Trainer", trainer.getUserId()));
 
-        boolean nameChanged = !existing.getFirstName().equals(trainer.getFirstName())
+        boolean isNameChanged = !existing.getFirstName().equals(trainer.getFirstName())
                 || !existing.getLastName().equals(trainer.getLastName());
 
         existing.setFirstName(trainer.getFirstName());
@@ -50,7 +50,7 @@ public class TrainerServiceImpl implements TrainerService {
         existing.setSpecialization(trainer.getSpecialization());
         existing.setActive(trainer.isActive());
 
-        if (nameChanged) {
+        if (isNameChanged) {
             String newUsername = usernameGenerator.generateUsername(
                     existing, name -> trainerRepository.findByUserName(name).isPresent()
             );
@@ -66,7 +66,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public Trainer getTrainerById(String trainerId) {
         return trainerRepository.findById(trainerId)
-                .orElseThrow(() -> new UserNotFoundException("Trainer not found id=" + trainerId));
+                .orElseThrow(() -> new UserNotFoundException("Trainer", trainerId));
     }
 
     @Override
