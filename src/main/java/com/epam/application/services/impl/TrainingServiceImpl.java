@@ -4,21 +4,26 @@ import com.epam.application.exceptions.TrainingNotFoundException;
 import com.epam.application.repository.TrainingRepository;
 import com.epam.application.services.TrainingService;
 import com.epam.model.Training;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class TrainingServiceImpl implements TrainingService {
     private static final Logger log = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
     private final TrainingRepository trainingRepository;
 
+    public TrainingServiceImpl(@Qualifier("jpaTrainingRepository") TrainingRepository trainingRepository) {
+        this.trainingRepository = trainingRepository;
+    }
+
+    @Transactional
     @Override
     public Training createTraining(Training training) {
         Training saved = trainingRepository.save(training);

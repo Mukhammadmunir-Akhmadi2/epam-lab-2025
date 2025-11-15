@@ -6,13 +6,17 @@ import com.epam.application.generators.UsernameGenerator;
 import com.epam.application.repository.TraineeRepository;
 import com.epam.application.services.TraineeService;
 import com.epam.model.Trainee;
-import lombok.RequiredArgsConstructor;
+import com.epam.model.Trainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class TraineeServiceImpl implements TraineeService {
     private static final Logger log = LoggerFactory.getLogger(TraineeServiceImpl.class);
 
@@ -21,6 +25,13 @@ public class TraineeServiceImpl implements TraineeService {
     private final UsernameGenerator usernameGenerator;
     private final PasswordGenerator passwordGenerator;
 
+    public TraineeServiceImpl( @Qualifier("jpaTraineeRepository") TraineeRepository traineeRepository, UsernameGenerator usernameGenerator, PasswordGenerator passwordGenerator) {
+        this.traineeRepository = traineeRepository;
+        this.usernameGenerator = usernameGenerator;
+        this.passwordGenerator = passwordGenerator;
+    }
+
+    @Transactional
     @Override
     public Trainee createTrainee(Trainee trainee) {
         String username = usernameGenerator
@@ -36,6 +47,7 @@ public class TraineeServiceImpl implements TraineeService {
         return saved;
     }
 
+    @Transactional
     @Override
     public Trainee updateTrainee(Trainee trainee) {
         Trainee existing = traineeRepository.findById(trainee.getUserId())
@@ -66,6 +78,7 @@ public class TraineeServiceImpl implements TraineeService {
         return updated;
     }
 
+    @Transactional
     @Override
     public void deleteTrainee(String traineeId) {
         traineeRepository.delete(traineeId);
@@ -85,5 +98,15 @@ public class TraineeServiceImpl implements TraineeService {
                 .orElseThrow(() ->
                         new UserNotFoundException("Trainee not found username=" + username)
                 );
+    }
+
+    @Transactional
+    @Override
+    public void updateTraineeTrainers(String traineeUsername, List<Trainer> trainers) {
+        Trainee trainee = traineeRepository.findByUserName(traineeUsername)
+                .orElseThrow(() -> new UserNotFoundException("Trainee", traineeUsername));
+
+        trainee.setTrainers(new HashSet<>(trainers));
+        traineeRepository.save(trainee);
     }
 }
