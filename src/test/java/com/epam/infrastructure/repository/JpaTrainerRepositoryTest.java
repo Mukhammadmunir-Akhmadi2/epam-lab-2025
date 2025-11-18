@@ -3,13 +3,13 @@ package com.epam.infrastructure.repository;
 import com.epam.application.repository.TrainerRepository;
 import com.epam.application.repository.TrainingTypeRepository;
 import com.epam.infrastructure.config.AppConfig;
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.Trainer;
 import com.epam.model.TrainingType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ class JpaTrainerRepositoryTest {
     @BeforeEach
     void setUp() {
         specialization = new TrainingType();
-        specialization.setTrainingType("WORKOUT_" + UUID.randomUUID());
+        specialization.setTrainingType(TrainingTypeEnum.CARDIO);
         specialization = trainingTypeRepository.save(specialization);
 
         String uid = UUID.randomUUID().toString().substring(0, 8);

@@ -5,6 +5,7 @@ import com.epam.application.generators.PasswordGenerator;
 import com.epam.application.generators.UsernameGenerator;
 import com.epam.application.repository.TrainerRepository;
 import com.epam.application.services.impl.TrainerServiceImpl;
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.Trainer;
 import com.epam.model.TrainingType;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,7 @@ class TrainerServiceImplTest {
 
         var trainingType = new TrainingType();
             trainingType.setTrainingTypeId(UUID.randomUUID().toString());
-            trainingType.setTrainingType("YOGA");
+            trainingType.setTrainingType(TrainingTypeEnum.YOGA);
 
         trainer = new Trainer();
         trainer.setUserId(UUID.randomUUID().toString());
@@ -75,7 +76,7 @@ class TrainerServiceImplTest {
 
         var trainingType = new TrainingType();
         trainingType.setTrainingTypeId(UUID.randomUUID().toString());
-        trainingType.setTrainingType("YOGA");
+        trainingType.setTrainingType(TrainingTypeEnum.YOGA);
 
         updatedInfo.setUserId(trainer.getUserId());
         updatedInfo.setFirstName("Alice");
@@ -148,12 +149,10 @@ class TrainerServiceImplTest {
         when(trainerRepository.findById(existing.getUserId()))
                 .thenReturn(Optional.of(existing));
 
-        // mock username generator so the lambda inside is executed
         when(usernameGenerator.generateUsername(eq(existing), any()))
                 .thenAnswer(inv -> {
-                    // Call the lambda: collision check
                     var lambda = inv.getArgument(1, java.util.function.Predicate.class);
-                    lambda.test("alice.johnson"); // triggers trainerRepository.findByUserName()
+                    lambda.test("alice.johnson");
 
                     return "alice.johnson";
                 });

@@ -1,6 +1,9 @@
 package com.epam.infrastructure.daos;
 
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQuery;
@@ -30,5 +33,6 @@ public class TrainingTypeDao {
     private UUID trainingTypeId;
 
     @Column(name = "training_type", nullable = false, unique = true, length = 50)
-    private String trainingType;
+    @Enumerated(value = EnumType.STRING)
+    private TrainingTypeEnum trainingType;
 }

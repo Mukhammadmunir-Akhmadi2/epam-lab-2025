@@ -1,10 +1,11 @@
 package com.epam.application.repository;
 
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.TrainingType;
 
 import java.util.Optional;
 
 public interface TrainingTypeRepository {
-    Optional<TrainingType> findByType(String type);
+    Optional<TrainingType> findByType(TrainingTypeEnum type);
     TrainingType save(TrainingType trainingType);
 }

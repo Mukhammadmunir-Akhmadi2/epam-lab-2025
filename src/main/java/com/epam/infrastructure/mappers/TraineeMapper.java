@@ -9,7 +9,10 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 
-@Mapper(uses = {CommonMapper.class, TrainingTypeMapper.class}, componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(uses = {CommonMapper.class},
+        componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface TraineeMapper {
 
     @Mapping(source = "userId", target = "userId", qualifiedByName = "uuidToString")

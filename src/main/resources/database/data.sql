@@ -1,4 +1,4 @@
-INSERT INTO users (user_id, first_name, last_name, email, password, is_active)
+INSERT INTO users (user_id, first_name, last_name, username, password, is_active)
 VALUES
     ('11111111-1111-1111-1111-111111111111', 'John', 'Doe', 'John.Doe', 'pass123', true),
     ('22222222-2222-2222-2222-222222222222', 'Alice', 'Smith', 'Alice.Smith', 'pass123', true),
@@ -11,8 +11,8 @@ VALUES
 
 INSERT INTO training_types (training_type_id, training_type)
 VALUES
-    ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Strength'),
-    ('aaaaaaa2-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Cardio');
+    ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'YOGA'),
+    ('aaaaaaa2-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'CROSSFIT');
 
 INSERT INTO trainers (user_id, training_type_id)
 VALUES

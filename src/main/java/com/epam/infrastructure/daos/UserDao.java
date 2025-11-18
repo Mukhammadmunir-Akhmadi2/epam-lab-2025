@@ -3,6 +3,7 @@ package com.epam.infrastructure.daos;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Inheritance;
@@ -20,7 +21,10 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class UserDao {
+@NamedQuery(name = "UserDao.findByUsername",
+        query = "SELECT u FROM UserDao u WHERE u.userName = :username"
+)
+public class UserDao {
     @Id
     @GeneratedValue
     @Column(name = "user_id")

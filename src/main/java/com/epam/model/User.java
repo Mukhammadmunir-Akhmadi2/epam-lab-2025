@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class User {
+public class User {
     protected String userId;
     @NotBlank
     protected String firstName;

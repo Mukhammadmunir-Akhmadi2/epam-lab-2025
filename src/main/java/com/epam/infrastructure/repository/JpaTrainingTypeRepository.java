@@ -2,6 +2,7 @@ package com.epam.infrastructure.repository;
 
 import com.epam.application.repository.TrainingTypeRepository;
 import com.epam.infrastructure.daos.TrainingTypeDao;
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.mappers.TrainingTypeMapper;
 import com.epam.model.TrainingType;
 import jakarta.persistence.EntityManager;
@@ -23,7 +24,7 @@ public class JpaTrainingTypeRepository implements TrainingTypeRepository {
     private final TrainingTypeMapper trainingTypeMapper;
 
     @Override
-    public Optional<TrainingType> findByType(String type) {
+    public Optional<TrainingType> findByType(TrainingTypeEnum type) {
         try {
             TrainingTypeDao result = entityManager
                     .createNamedQuery("TrainingTypeDao.findByType", TrainingTypeDao.class)

@@ -5,6 +5,7 @@ import com.epam.application.repository.TrainingRepository;
 import com.epam.application.repository.TrainerRepository;
 import com.epam.application.repository.TrainingTypeRepository;
 import com.epam.infrastructure.config.AppConfig;
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
 import com.epam.model.Training;
@@ -12,7 +13,6 @@ import com.epam.model.TrainingType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.hibernate.PropertyValueException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +74,7 @@ class JpaTrainingRepositoryTest {
         });
 
         trainingType = new TrainingType();
-        trainingType.setTrainingType("CROSSFIT_" + UUID.randomUUID());
+        trainingType.setTrainingType(TrainingTypeEnum.CARDIO);
         trainingType = trainingTypeRepository.save(trainingType);
 
         trainer = new Trainer();

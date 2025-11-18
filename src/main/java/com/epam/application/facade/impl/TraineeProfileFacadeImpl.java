@@ -1,9 +1,9 @@
 package com.epam.application.facade.impl;
 
-import com.epam.application.exceptions.InvalidCredentialException;
 import com.epam.application.exceptions.UnauthorizedAccess;
 import com.epam.application.facade.TraineeProfileFacade;
-import com.epam.application.services.TraineeAuthService;
+import com.epam.application.provider.AuthProviderService;
+import com.epam.application.services.BaseUserAuthService;
 import com.epam.application.services.TraineeService;
 import com.epam.application.services.TrainerQueryService;
 import com.epam.application.services.TrainerService;
@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,15 +27,14 @@ import java.util.Map;
 public class TraineeProfileFacadeImpl implements TraineeProfileFacade {
 
     private final TraineeService traineeService;
-    private final TraineeAuthService traineeAuthService;
+    private final BaseUserAuthService authService;
     private final TrainerService trainerService;
     private final TrainerQueryService trainerQueryService;
     private final TrainingQueryService trainingQueryService;
-
-    private final Map<String, Trainee> authenticatedSessions = new HashMap<>();
+    private final AuthProviderService authProviderService;
 
     @Override
-    public Trainee traineeRegistration(@Valid Trainee trainee) {
+    public Trainee registerTrainee(@Valid Trainee trainee) {
         return traineeService.createTrainee(trainee);
     }
 
@@ -60,27 +57,21 @@ public class TraineeProfileFacadeImpl implements TraineeProfileFacade {
     }
 
     @Override
-    public String toggleActive(String traineeUsername) {
+    public boolean toggleActive(String traineeUsername) {
         isAuthenticated(traineeUsername);
-        return traineeAuthService.toggleActive(traineeUsername);
+        return authService.toggleActive(traineeUsername);
     }
 
     @Override
     public String login(String traineeUsername, String password) {
-        Trainee trainee = traineeService.getTraineeByUserName(traineeUsername);
-
-        if (!trainee.getPassword().equals(password)) {
-            throw new InvalidCredentialException("Invalid password for trainee " + traineeUsername);
-        }
-        authenticatedSessions.put(traineeUsername, trainee);
-        return "Trainee " + traineeUsername + " authenticated successfully.";
+        return authService.authenticateUser(traineeUsername, password);
     }
 
     @Override
     public void changePassword(String traineeUsername, String oldPassword, @Size(min = 6) String newPassword) {
         isAuthenticated(traineeUsername);
 
-        traineeAuthService.changePassword(traineeUsername, oldPassword, newPassword);
+        authService.changePassword(traineeUsername, oldPassword, newPassword);
     }
 
     @Override
@@ -113,9 +104,9 @@ public class TraineeProfileFacadeImpl implements TraineeProfileFacade {
         return trainingQueryService.getTraineeTrainings(traineeUsername, from, to, trainerUsername, trainingType);
     }
 
-    private void isAuthenticated(String username) {
-        if (!authenticatedSessions.containsKey(username)) {
-            throw new UnauthorizedAccess("Trainee " + username + " is not authenticated.");
-        };
+    private void isAuthenticated(String traineeUsername) {
+        if (!authProviderService.isAuthenticated(traineeUsername)) {
+            throw new UnauthorizedAccess("Trainee " + traineeUsername + " is not authenticated.");
+        }
     }
 }

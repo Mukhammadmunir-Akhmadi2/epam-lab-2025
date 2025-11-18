@@ -2,6 +2,7 @@ package com.epam.application.services;
 
 import com.epam.application.repository.TrainingTypeRepository;
 import com.epam.application.services.impl.TrainingTypeServiceImpl;
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.utils.TrainingTypeUtils;
 import com.epam.model.TrainingType;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,45 +31,25 @@ class TrainingTypeServiceImplTest {
     @BeforeEach
     void setUp() {
         existingType = new TrainingType();
-        existingType.setTrainingType("CARDIO");
+        existingType.setTrainingType(TrainingTypeEnum.CARDIO);
     }
 
     @Test
     void findOrCreate_shouldReturnExistingType() {
         String typeName = "cardio";
 
-        when(trainingTypeRepository.findByType(TrainingTypeUtils.normalize(typeName)))
+        String normalizedType = TrainingTypeUtils.normalize(typeName);
+
+        when(trainingTypeRepository.findByType(TrainingTypeEnum.valueOf(normalizedType)))
                 .thenReturn(Optional.of(existingType));
 
-        TrainingType result = trainingTypeService.findOrCreate(typeName);
+        TrainingType result = trainingTypeService.getTrainingType(TrainingTypeEnum.valueOf(normalizedType));
 
         assertNotNull(result);
-        assertEquals("CARDIO", result.getTrainingType());
+        assertEquals(TrainingTypeEnum.CARDIO, result.getTrainingType());
 
         verify(trainingTypeRepository, times(1))
-                .findByType(TrainingTypeUtils.normalize(typeName));
+                .findByType(TrainingTypeEnum.valueOf(normalizedType));
         verify(trainingTypeRepository, never()).save(any());
-    }
-
-    @Test
-    void findOrCreate_shouldCreateNewTypeIfNotExists() {
-        String typeName = "strength";
-
-        when(trainingTypeRepository.findByType(TrainingTypeUtils.normalize(typeName)))
-                .thenReturn(Optional.empty());
-
-        TrainingType savedType = new TrainingType();
-        savedType.setTrainingType(TrainingTypeUtils.normalize(typeName));
-
-        when(trainingTypeRepository.save(any())).thenReturn(savedType);
-
-        TrainingType result = trainingTypeService.findOrCreate(typeName);
-
-        assertNotNull(result);
-        assertEquals("STRENGTH", result.getTrainingType());
-
-        verify(trainingTypeRepository, times(1))
-                .findByType(TrainingTypeUtils.normalize(typeName));
-        verify(trainingTypeRepository, times(1)).save(any());
     }
 }

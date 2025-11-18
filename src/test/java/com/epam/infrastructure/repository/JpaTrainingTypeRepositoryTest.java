@@ -2,6 +2,7 @@ package com.epam.infrastructure.repository;
 
 import com.epam.application.repository.TrainingTypeRepository;
 import com.epam.infrastructure.config.AppConfig;
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.TrainingType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -36,7 +37,7 @@ class JpaTrainingTypeRepositoryTest {
     @BeforeEach
     void setUp() {
         trainingType = new TrainingType();
-        trainingType.setTrainingType("CARDIO");
+        trainingType.setTrainingType(TrainingTypeEnum.CARDIO);
     }
 
     @AfterEach
@@ -50,34 +51,28 @@ class JpaTrainingTypeRepositoryTest {
 
     @Test
     void save_shouldPersistTrainingType() {
-        trainingType.setTrainingType("CARDIO");
+        trainingType.setTrainingType(TrainingTypeEnum.CARDIO);
         TrainingType saved = trainingTypeRepository.save(trainingType);
         assertNotNull(saved.getTrainingTypeId());
-        assertEquals("CARDIO", saved.getTrainingType());
+        assertEquals(TrainingTypeEnum.CARDIO, saved.getTrainingType());
     }
 
     @Test
     void findByType_shouldReturnTrainingType() {
-        trainingType.setTrainingType("CARDIO");
+        trainingType.setTrainingType(TrainingTypeEnum.CARDIO);
         TrainingType saved = trainingTypeRepository.save(trainingType);
-        Optional<TrainingType> found = trainingTypeRepository.findByType("CARDIO");
+        Optional<TrainingType> found = trainingTypeRepository.findByType(TrainingTypeEnum.CARDIO);
         assertTrue(found.isPresent());
         assertEquals(saved.getTrainingTypeId(), found.get().getTrainingTypeId());
     }
 
     @Test
-    void findByType_shouldReturnEmptyForUnknownType() {
-        Optional<TrainingType> found = trainingTypeRepository.findByType("UNKNOWN");
-        assertTrue(found.isEmpty());
-    }
-
-    @Test
     void save_shouldUpdateExistingTrainingType() {
-        trainingType.setTrainingType("CARDIO");
+        trainingType.setTrainingType(TrainingTypeEnum.CARDIO);
         TrainingType saved = trainingTypeRepository.save(trainingType);
-        saved.setTrainingType("STRENGTH");
+        saved.setTrainingType(TrainingTypeEnum.STRENGTH);
         TrainingType updated = trainingTypeRepository.save(saved);
         assertEquals(saved.getTrainingTypeId(), updated.getTrainingTypeId());
-        assertEquals("STRENGTH", updated.getTrainingType());
+        assertEquals(TrainingTypeEnum.STRENGTH, updated.getTrainingType());
     }
 }

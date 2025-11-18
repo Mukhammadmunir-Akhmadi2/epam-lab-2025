@@ -180,8 +180,6 @@ class TraineeServiceImplTest {
 
     @Test
     void testUpdateTraineeChangesUsername() {
-
-        // IMPORTANT: return a NEW object, not the same instance
         Trainee stored = new Trainee();
         stored.setUserId(defaultTrainee.getUserId());
         stored.setFirstName(defaultTrainee.getFirstName());

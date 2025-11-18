@@ -2,6 +2,7 @@ package com.epam.infrastructure.repository;
 
 import com.epam.application.repository.*;
 import com.epam.infrastructure.config.AppConfig;
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -62,7 +63,7 @@ class JpaTrainingQueryRepositoryTest {
     void setUp() {
         // Fresh TrainingType
         trainingType = new TrainingType();
-        trainingType.setTrainingType("CARDIO_" + UUID.randomUUID());
+        trainingType.setTrainingType(TrainingTypeEnum.CARDIO);
         trainingType = trainingTypeRepository.save(trainingType);
 
         trainer = new Trainer();
@@ -136,7 +137,7 @@ class JpaTrainingQueryRepositoryTest {
     @Test
     void findTrainingsByTraineeUsernameWithFilters_shouldFilterByTrainingType() {
         List<Training> trainings = trainingQueryRepository.findTrainingsByTraineeUsernameWithFilters(
-                trainee.getUserName(), null, null, null, trainingType.getTrainingType()
+                trainee.getUserName(), null, null, null, trainingType.getTrainingType().toString()
         );
 
         assertEquals(2, trainings.size());

@@ -8,11 +8,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface TraineeProfileFacade {
-    Trainee traineeRegistration(Trainee trainee);
+    Trainee registerTrainee(Trainee trainee);
     Trainee updateTraineeProfile(Trainee trainee);
     Trainee getTraineeProfile(String traineeUsername);
     void deleteTraineeProfile(String traineeUsername);
-    String toggleActive(String traineeUsername);
+    boolean toggleActive(String traineeUsername);
     String login(String traineeUsername, String password);
     void changePassword(String traineeUsername, String oldPassword, String newPassword);
     List<Trainer> updatTraineeTrainersList(String traineeUsername, List<String> trainersUserNames);
