@@ -6,13 +6,13 @@ import com.epam.application.generators.UsernameGenerator;
 import com.epam.application.repository.TrainerRepository;
 import com.epam.application.services.TrainerService;
 import com.epam.model.Trainer;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class TrainerServiceImpl implements TrainerService {
     private static final Logger log = LoggerFactory.getLogger(TrainerServiceImpl.class);
 
@@ -21,6 +21,13 @@ public class TrainerServiceImpl implements TrainerService {
     private final UsernameGenerator usernameGenerator;
     private final PasswordGenerator passwordGenerator;
 
+    public TrainerServiceImpl(@Qualifier("jpaTrainerRepository")TrainerRepository trainerRepository, UsernameGenerator usernameGenerator, PasswordGenerator passwordGenerator) {
+        this.trainerRepository = trainerRepository;
+        this.usernameGenerator = usernameGenerator;
+        this.passwordGenerator = passwordGenerator;
+    }
+
+    @Transactional
     @Override
     public Trainer createTrainer(Trainer trainer) {
         String username = usernameGenerator.generateUsername(
@@ -37,6 +44,7 @@ public class TrainerServiceImpl implements TrainerService {
         return saved;
     }
 
+    @Transactional
     @Override
     public Trainer updateTrainer(Trainer trainer) {
         Trainer existing = trainerRepository.findById(trainer.getUserId())
@@ -70,8 +78,8 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer getTrainerByUserName(String username) {
-        return trainerRepository.findByUserName(username)
-                .orElseThrow(() -> new UserNotFoundException("Trainer not found username=" + username));
+    public Trainer getTrainerByUserName(String trainerUserName) {
+        return trainerRepository.findByUserName(trainerUserName)
+                .orElseThrow(() -> new UserNotFoundException("Trainer not found username=" + trainerUserName));
     }
 }

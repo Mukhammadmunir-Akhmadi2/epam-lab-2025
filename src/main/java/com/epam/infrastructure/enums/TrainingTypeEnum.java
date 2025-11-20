@@ -1,6 +1,6 @@
 package com.epam.infrastructure.enums;
 
-public enum TrainingType {
+public enum TrainingTypeEnum {
     YOGA,
     CARDIO,
     STRENGTH,
