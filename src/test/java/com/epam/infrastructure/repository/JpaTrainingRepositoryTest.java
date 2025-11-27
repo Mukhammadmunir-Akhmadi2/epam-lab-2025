@@ -1,10 +1,5 @@
 package com.epam.infrastructure.repository;
 
-import com.epam.application.repository.TraineeRepository;
-import com.epam.application.repository.TrainingRepository;
-import com.epam.application.repository.TrainerRepository;
-import com.epam.application.repository.TrainingTypeRepository;
-import com.epam.infrastructure.config.AppConfig;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
@@ -12,14 +7,13 @@ import com.epam.model.Training;
 import com.epam.model.TrainingType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.hibernate.PropertyValueException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -30,26 +24,21 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitConfig(AppConfig.class)
 @ActiveProfiles("test")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest
 class JpaTrainingRepositoryTest {
 
     @Autowired
-    @Qualifier("jpaTrainingRepository")
-    private TrainingRepository trainingRepository;
+    private JpaTrainingRepository trainingRepository;
 
     @Autowired
-    @Qualifier("jpaTrainerRepository")
-    private TrainerRepository trainerRepository;
+    private JpaTrainerRepository trainerRepository;
 
     @Autowired
-    @Qualifier("jpaTraineeRepository")
-    private TraineeRepository traineeRepository;
+    private JpaTraineeRepository traineeRepository;
 
     @Autowired
-    @Qualifier("jpaTrainingTypeRepository")
-    private TrainingTypeRepository trainingTypeRepository;
+    private JpaTrainingTypeRepository trainingTypeRepository;
 
     @PersistenceContext
     private EntityManager em;
@@ -64,21 +53,12 @@ class JpaTrainingRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        TransactionTemplate tx = new TransactionTemplate(transactionManager);
-        tx.execute(status -> {
-            em.createQuery("DELETE FROM TrainingDao t").executeUpdate();
-            em.createQuery("DELETE FROM TrainerDao t").executeUpdate();
-            em.createQuery("DELETE FROM TraineeDao t").executeUpdate();
-            em.createQuery("DELETE FROM TrainingTypeDao tt").executeUpdate();
-            return null;
-        });
-
         trainingType = new TrainingType();
         trainingType.setTrainingType(TrainingTypeEnum.CARDIO);
         trainingType = trainingTypeRepository.save(trainingType);
 
         trainer = new Trainer();
-        trainer.setUserName("trainer_" + UUID.randomUUID());
+        trainer.setUsername("trainer_" + UUID.randomUUID());
         trainer.setFirstName("John");
         trainer.setLastName("Doe");
         trainer.setPassword("pass123");
@@ -87,7 +67,7 @@ class JpaTrainingRepositoryTest {
         trainer = trainerRepository.save(trainer);
 
         trainee = new Trainee();
-        trainee.setUserName("trainee_" + UUID.randomUUID());
+        trainee.setUsername("trainee_" + UUID.randomUUID());
         trainee.setFirstName("Alice");
         trainee.setLastName("Smith");
         trainee.setPassword("abc123");
@@ -101,6 +81,18 @@ class JpaTrainingRepositoryTest {
         training.setTrainingType(trainingType);
         training.setDate(LocalDateTime.now().plusDays(1));
         training.setDuration(60);
+    }
+
+    @AfterEach
+    void cleanUp() {
+        TransactionTemplate tx = new TransactionTemplate(transactionManager);
+        tx.execute(status -> {
+            em.createQuery("DELETE FROM TrainingDao t").executeUpdate();
+            em.createQuery("DELETE FROM TrainerDao t").executeUpdate();
+            em.createQuery("DELETE FROM TraineeDao t").executeUpdate();
+            em.createQuery("DELETE FROM TrainingTypeDao tt").executeUpdate();
+            return null;
+        });
     }
 
     @Test
@@ -139,25 +131,25 @@ class JpaTrainingRepositoryTest {
     @Test
     void save_shouldFail_whenTrainingNameIsNull() {
         training.setTrainingName(null);
-        assertThrows(PropertyValueException.class, () -> trainingRepository.save(training));
+        assertThrows(DataIntegrityViolationException.class, () -> trainingRepository.save(training));
     }
 
     @Test
     void save_shouldFail_whenTrainerIsNull() {
         training.setTrainer(null);
-        assertThrows(PropertyValueException.class, () -> trainingRepository.save(training));
+        assertThrows(DataIntegrityViolationException.class, () -> trainingRepository.save(training));
     }
 
     @Test
     void save_shouldFail_whenTraineeIsNull() {
         training.setTrainee(null);
-        assertThrows(PropertyValueException.class, () -> trainingRepository.save(training));
+        assertThrows(DataIntegrityViolationException.class, () -> trainingRepository.save(training));
     }
 
     @Test
     void save_shouldFail_whenTrainingTypeIsNull() {
         training.setTrainingType(null);
-        assertThrows(PropertyValueException.class, () -> trainingRepository.save(training));
+        assertThrows(DataIntegrityViolationException.class, () -> trainingRepository.save(training));
     }
 
     @Test

@@ -1,17 +1,17 @@
 package com.epam.infrastructure.repository;
 
-import com.epam.application.repository.TraineeRepository;
-import com.epam.infrastructure.config.AppConfig;
-
 import com.epam.model.Trainee;
-import org.hibernate.PropertyValueException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,34 +23,46 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-@SpringJUnitConfig(AppConfig.class)
 @ActiveProfiles("test")
+@SpringBootTest
 class JpaTraineeRepositoryTest {
 
     @Autowired
-    @Qualifier("jpaTraineeRepository")
-    private TraineeRepository traineeRepository;
+    private JpaTraineeRepository traineeRepository;
 
     private Trainee trainee;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    @PersistenceContext
+    private EntityManager em;
 
     @BeforeEach
     void setUp() {
         trainee = new Trainee();
-        trainee.setUserName("john.doe");
+        trainee.setUsername("john.doe");
         trainee.setFirstName("John");
         trainee.setLastName("Doe");
         trainee.setPassword("secret123");
         trainee.setActive(true);
+    }
 
-        traineeRepository.findAll()
-                .forEach(t -> traineeRepository.delete(t.getUserId()));
+    @AfterEach
+    void cleanUp() {
+        TransactionTemplate tx = new TransactionTemplate(transactionManager);
+        tx.execute(status -> {
+            em.createQuery("DELETE FROM TraineeDao t").executeUpdate();
+            em.createQuery("DELETE FROM TrainingTypeDao tt").executeUpdate();
+            return null;
+        });
     }
 
     @Test
     void save_shouldPersistTrainee() {
         Trainee saved = traineeRepository.save(trainee);
         assertNotNull(saved.getUserId());
-        assertEquals("john.doe", saved.getUserName());
+        assertEquals("john.doe", saved.getUsername());
     }
 
     @Test
@@ -58,7 +70,7 @@ class JpaTraineeRepositoryTest {
         Trainee saved = traineeRepository.save(trainee);
         Optional<Trainee> found = traineeRepository.findById(saved.getUserId().toString());
         assertTrue(found.isPresent());
-        assertEquals("john.doe", found.get().getUserName());
+        assertEquals("john.doe", found.get().getUsername());
     }
 
     @Test
@@ -66,7 +78,7 @@ class JpaTraineeRepositoryTest {
         traineeRepository.save(trainee);
         Optional<Trainee> found = traineeRepository.findByUserName("john.doe");
         assertTrue(found.isPresent());
-        assertEquals("john.doe", found.get().getUserName());
+        assertEquals("john.doe", found.get().getUsername());
     }
 
     @Test
@@ -74,7 +86,7 @@ class JpaTraineeRepositoryTest {
         traineeRepository.save(trainee);
 
         Trainee another = new Trainee();
-        another.setUserName("jane.doe2");
+        another.setUsername("jane.doe2");
         another.setFirstName("Jane");
         another.setLastName("Doe");
         another.setPassword("pass1234");
@@ -93,30 +105,29 @@ class JpaTraineeRepositoryTest {
         assertFalse(found.isPresent());
     }
 
-    // ---- FAIL CASES ----
 
     @Test
     void save_shouldFail_whenUserNameIsNull() {
-        trainee.setUserName(null);
-        assertThrows(PropertyValueException.class, () -> traineeRepository.save(trainee));
+        trainee.setUsername(null);
+        assertThrows(DataIntegrityViolationException.class, () -> traineeRepository.save(trainee));
     }
 
     @Test
     void save_shouldFail_whenPasswordIsNull() {
         trainee.setPassword(null);
-        assertThrows(PropertyValueException.class, () -> traineeRepository.save(trainee));
+        assertThrows(DataIntegrityViolationException.class, () -> traineeRepository.save(trainee));
     }
 
     @Test
     void save_shouldFail_whenFirstNameIsNull() {
         trainee.setFirstName(null);
-        assertThrows(PropertyValueException.class, () -> traineeRepository.save(trainee));
+        assertThrows(DataIntegrityViolationException.class, () -> traineeRepository.save(trainee));
     }
 
     @Test
     void save_shouldFail_whenLastNameIsNull() {
         trainee.setLastName(null);
-        assertThrows(PropertyValueException.class, () -> traineeRepository.save(trainee));
+        assertThrows(DataIntegrityViolationException.class, () -> traineeRepository.save(trainee));
     }
 
     @Test
@@ -124,7 +135,7 @@ class JpaTraineeRepositoryTest {
         traineeRepository.save(trainee);
 
         Trainee duplicate = new Trainee();
-        duplicate.setUserName("john.doe");
+        duplicate.setUsername("john.doe");
         duplicate.setFirstName("John2");
         duplicate.setLastName("Doe2");
         duplicate.setPassword("secret456");

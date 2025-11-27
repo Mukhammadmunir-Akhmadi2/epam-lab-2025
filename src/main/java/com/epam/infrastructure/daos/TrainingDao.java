@@ -30,7 +30,7 @@ import java.util.UUID;
         ),
         @NamedQuery(
                 name = "TrainingDao.findByIdDetailed",
-                query = "SELECT t FROM TrainingDao t JOIN FETCH t.trainer JOIN FETCH t.trainingType LEFT JOIN FETCH t.trainee WHERE t.trainingId = :trainingId"
+                query = "SELECT t FROM TrainingDao t JOIN FETCH t.trainer JOIN FETCH t.trainingType JOIN FETCH t.trainee WHERE t.trainingId = :trainingId"
         )
 })
 public class TrainingDao {
@@ -41,7 +41,7 @@ public class TrainingDao {
     private UUID trainingId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "trainee_id")
+    @JoinColumn(name = "trainee_id", nullable = false)
     private TraineeDao trainee;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

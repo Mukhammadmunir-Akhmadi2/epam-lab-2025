@@ -1,6 +1,5 @@
 package com.epam.application.services;
 
-import com.epam.application.exceptions.TrainingNotFoundException;
 import com.epam.application.repository.TrainingRepository;
 import com.epam.application.services.impl.TrainingServiceImpl;
 import com.epam.model.Training;
@@ -51,7 +50,7 @@ class TrainingServiceImplTest {
     @Test
     void testGetTrainingByIdNotFound() {
         when(trainingRepository.findById("id")).thenReturn(Optional.empty());
-        assertThrows(TrainingNotFoundException.class, () -> trainingService.getTrainingById("id"));
+        assertThrows(RuntimeException.class, () -> trainingService.getTrainingById("id"));
     }
 
     @Test

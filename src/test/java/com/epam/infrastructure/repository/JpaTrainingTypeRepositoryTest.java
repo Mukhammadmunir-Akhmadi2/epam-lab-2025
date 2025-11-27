@@ -1,7 +1,5 @@
 package com.epam.infrastructure.repository;
 
-import com.epam.application.repository.TrainingTypeRepository;
-import com.epam.infrastructure.config.AppConfig;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.TrainingType;
 import jakarta.persistence.EntityManager;
@@ -10,17 +8,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitConfig(AppConfig.class)
 @ActiveProfiles("test")
+@SpringBootTest
 class JpaTrainingTypeRepositoryTest {
 
     @Autowired
@@ -30,7 +29,7 @@ class JpaTrainingTypeRepositoryTest {
     EntityManager em;
 
     @Autowired
-    private TrainingTypeRepository trainingTypeRepository;
+    private JpaTrainingTypeRepository trainingTypeRepository;
 
     private TrainingType trainingType;
 
@@ -75,4 +74,24 @@ class JpaTrainingTypeRepositoryTest {
         assertEquals(saved.getTrainingTypeId(), updated.getTrainingTypeId());
         assertEquals(TrainingTypeEnum.STRENGTH, updated.getTrainingType());
     }
+
+    @Test
+    void findAll_shouldReturnAllTrainingTypes() {
+        TrainingType cardio = new TrainingType();
+        cardio.setTrainingType(TrainingTypeEnum.CARDIO);
+        TrainingType strength = new TrainingType();
+        strength.setTrainingType(TrainingTypeEnum.STRENGTH);
+
+        trainingTypeRepository.save(cardio);
+        trainingTypeRepository.save(strength);
+
+        List<TrainingType> allTypes = trainingTypeRepository.findAll();
+
+        assertNotNull(allTypes);
+        assertEquals(2, allTypes.size());
+
+        assertTrue(allTypes.stream().anyMatch(tt -> tt.getTrainingType() == TrainingTypeEnum.CARDIO));
+        assertTrue(allTypes.stream().anyMatch(tt -> tt.getTrainingType() == TrainingTypeEnum.STRENGTH));
+    }
+
 }

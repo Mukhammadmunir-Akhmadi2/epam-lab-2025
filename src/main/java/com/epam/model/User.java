@@ -14,7 +14,7 @@ public class User {
     protected String firstName;
     @NotBlank
     protected String lastName;
-    protected String userName;
+    protected String username;
     protected String password;
     protected boolean isActive;
 }

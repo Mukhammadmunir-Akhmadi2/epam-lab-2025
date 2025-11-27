@@ -1,22 +1,17 @@
 package com.epam.infrastructure.repository;
 
-import com.epam.application.repository.TrainerRepository;
-import com.epam.application.repository.TrainingTypeRepository;
-import com.epam.infrastructure.config.AppConfig;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.Trainer;
 import com.epam.model.TrainingType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -26,16 +21,15 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitConfig(AppConfig.class)
 @ActiveProfiles("test")
+@SpringBootTest
 class JpaTrainerRepositoryTest {
 
     @Autowired
-    @Qualifier("jpaTrainerRepository")
-    private TrainerRepository trainerRepository;
+    private JpaTrainerRepository trainerRepository;
 
     @Autowired
-    private TrainingTypeRepository trainingTypeRepository;
+    private JpaTrainingTypeRepository trainingTypeRepository;
 
     @Autowired
     private PlatformTransactionManager transactionManager;
@@ -54,7 +48,7 @@ class JpaTrainerRepositoryTest {
 
         String uid = UUID.randomUUID().toString().substring(0, 8);
         trainer = new Trainer();
-        trainer.setUserName("trainer_" + uid);
+        trainer.setUsername("trainer_" + uid);
         trainer.setFirstName("John");
         trainer.setLastName("Doe");
         trainer.setPassword("pass123");
@@ -76,23 +70,23 @@ class JpaTrainerRepositoryTest {
     void save_shouldPersistTrainer() {
         Trainer saved = trainerRepository.save(trainer);
         assertNotNull(saved.getUserId());
-        assertEquals(trainer.getUserName(), saved.getUserName());
+        assertEquals(trainer.getUsername(), saved.getUsername());
     }
 
     @Test
     void findById_shouldReturnTrainer() {
         Trainer saved = trainerRepository.save(trainer);
-        Optional<Trainer> found = trainerRepository.findById(saved.getUserId().toString());
+        Optional<Trainer> found = trainerRepository.findById(saved.getUserId());
         assertTrue(found.isPresent());
-        assertEquals(saved.getUserName(), found.get().getUserName());
+        assertEquals(saved.getUsername(), found.get().getUsername());
     }
 
     @Test
     void findByUserName_shouldReturnTrainer() {
         Trainer saved = trainerRepository.save(trainer);
-        Optional<Trainer> found = trainerRepository.findByUserName(saved.getUserName());
+        Optional<Trainer> found = trainerRepository.findByUserName(saved.getUsername());
         assertTrue(found.isPresent());
-        assertEquals(saved.getUserName(), found.get().getUserName());
+        assertEquals(saved.getUsername(), found.get().getUsername());
     }
 
     @Test
@@ -100,7 +94,7 @@ class JpaTrainerRepositoryTest {
         trainerRepository.save(trainer);
 
         Trainer another = new Trainer();
-        another.setUserName("trainer_" + UUID.randomUUID());
+        another.setUsername("trainer_" + UUID.randomUUID());
         another.setFirstName("Alice");
         another.setLastName("Smith");
         another.setPassword("abc123");
@@ -114,26 +108,26 @@ class JpaTrainerRepositoryTest {
 
     @Test
     void save_shouldFail_whenUserNameIsNull() {
-        trainer.setUserName(null);
-        assertThrows(PropertyValueException.class, () -> trainerRepository.save(trainer));
+        trainer.setUsername(null);
+        assertThrows(DataIntegrityViolationException.class, () -> trainerRepository.save(trainer));
     }
 
     @Test
     void save_shouldFail_whenPasswordIsNull() {
         trainer.setPassword(null);
-        assertThrows(PropertyValueException.class, () -> trainerRepository.save(trainer));
+        assertThrows(DataIntegrityViolationException.class, () -> trainerRepository.save(trainer));
     }
 
     @Test
     void save_shouldFail_whenFirstNameIsNull() {
         trainer.setFirstName(null);
-        assertThrows(PropertyValueException.class, () -> trainerRepository.save(trainer));
+        assertThrows(DataIntegrityViolationException.class, () -> trainerRepository.save(trainer));
     }
 
     @Test
     void save_shouldFail_whenLastNameIsNull() {
         trainer.setLastName(null);
-        assertThrows(PropertyValueException.class, () -> trainerRepository.save(trainer));
+        assertThrows(DataIntegrityViolationException.class, () -> trainerRepository.save(trainer));
     }
 
     @Test
@@ -141,7 +135,7 @@ class JpaTrainerRepositoryTest {
         Trainer saved = trainerRepository.save(trainer);
 
         Trainer duplicate = new Trainer();
-        duplicate.setUserName(saved.getUserName());
+        duplicate.setUsername(saved.getUsername());
         duplicate.setFirstName("John2");
         duplicate.setLastName("Doe2");
         duplicate.setPassword("pass456");

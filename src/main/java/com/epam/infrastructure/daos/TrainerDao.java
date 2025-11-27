@@ -27,11 +27,15 @@ import java.util.Set;
 @NamedQueries({
         @NamedQuery(
                 name = "TrainerDao.findByUserName",
-                query = "SELECT t FROM TrainerDao t JOIN FETCH t.specialization WHERE t.userName = :username"
+                query = "SELECT t FROM TrainerDao t JOIN FETCH t.specialization LEFT JOIN FETCH t.trainees WHERE t.username = :username"
         ),
         @NamedQuery(
                 name = "TrainerDao.findAll",
                 query = "SELECT t FROM TrainerDao t JOIN FETCH t.specialization"
+        ),
+        @NamedQuery(
+                name = "TrainerDao.findById",
+                query = "SELECT t FROM TrainerDao t JOIN FETCH t.specialization LEFT JOIN FETCH t.trainees WHERE t.userId = :userId"
         )
 })
 public class TrainerDao extends UserDao {

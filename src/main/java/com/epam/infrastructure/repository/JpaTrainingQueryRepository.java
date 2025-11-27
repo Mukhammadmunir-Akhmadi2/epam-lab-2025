@@ -2,6 +2,7 @@ package com.epam.infrastructure.repository;
 
 import com.epam.application.repository.TrainingQueryRepository;
 import com.epam.infrastructure.daos.TrainingDao;
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.mappers.TrainingMapper;
 import com.epam.model.Training;
 import jakarta.persistence.EntityManager;
@@ -26,26 +27,31 @@ public class JpaTrainingQueryRepository implements TrainingQueryRepository {
     private final TrainingMapper trainingMapper;
 
     @Override
-    public List<Training> findTrainingsByTraineeUsernameWithFilters(String traineeUsername, LocalDate from, LocalDate to, String trainerName, String trainingType) {
+    public List<Training> findTrainingsByTraineeUsernameWithFilters(String traineeUsername, LocalDate from, LocalDate to, String trainerName, TrainingTypeEnum trainingType) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<TrainingDao> cq = cb.createQuery(TrainingDao.class);
         Root<TrainingDao> trainingRoot = cq.from(TrainingDao.class);
 
-        Predicate predicate = cb.equal(trainingRoot.get("trainee").get("userName"), traineeUsername);
+        trainingRoot.fetch("trainee");
+        trainingRoot.fetch("trainer");
+        trainingRoot.fetch("trainingType");
+
+        Predicate predicate = cb.equal(trainingRoot.get("trainee").get("username"), traineeUsername);
 
         predicate = getPredicate(from, to, cb, trainingRoot, predicate);
 
         if (trainerName != null && !trainerName.isBlank()) {
-            predicate = cb.and(predicate, cb.like(trainingRoot.get("trainer").get("userName"), "%" + trainerName + "%"));
+            predicate = cb.and(predicate, cb.like(trainingRoot.get("trainer").get("username"), "%" + trainerName + "%"));
         }
 
-        if (trainingType != null && !trainingType.isBlank()) {
+        if (trainingType != null) {
             predicate = cb.and(predicate, cb.equal(trainingRoot.get("trainingType").get("trainingType"), trainingType));
         }
 
+
         cq.select(trainingRoot).where(predicate).distinct(true);
 
-        return trainingMapper.toModelList(entityManager.createQuery(cq).getResultList());
+        return trainingMapper.toFullModelList(entityManager.createQuery(cq).getResultList());
     }
 
     @Override
@@ -53,18 +59,23 @@ public class JpaTrainingQueryRepository implements TrainingQueryRepository {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<TrainingDao> cq = cb.createQuery(TrainingDao.class);
         Root<TrainingDao> trainingRoot = cq.from(TrainingDao.class);
-        Predicate predicate = cb.equal(trainingRoot.get("trainer").get("userName"), trainerUsername);
+
+        trainingRoot.fetch("trainee");
+        trainingRoot.fetch("trainer");
+        trainingRoot.fetch("trainingType");
+
+        Predicate predicate = cb.equal(trainingRoot.get("trainer").get("username"), trainerUsername);
 
         predicate = getPredicate(from, to, cb, trainingRoot, predicate);
 
         if (traineeName != null && !traineeName.isBlank()) {
-            predicate = cb.and(predicate, cb.like(trainingRoot.get("trainee").get("userName"), "%" + traineeName + "%"));
+            predicate = cb.and(predicate, cb.like(trainingRoot.get("trainee").get("username"), "%" + traineeName + "%"));
         }
 
         cq.select(trainingRoot).where(predicate).distinct(true);
 
 
-        return trainingMapper.toModelList(entityManager.createQuery(cq).getResultList());
+        return trainingMapper.toFullModelList(entityManager.createQuery(cq).getResultList());
     }
 
     private Predicate getPredicate(LocalDate from, LocalDate to, CriteriaBuilder cb, Root<TrainingDao> trainingRoot, Predicate predicate) {

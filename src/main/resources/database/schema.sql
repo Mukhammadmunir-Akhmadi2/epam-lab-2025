@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS users (
     user_id UUID PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
-    user_name VARCHAR(100) NOT NULL UNIQUE,
+    username VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(18) NOT NULL,
     is_active BOOLEAN NOT NULL
 );

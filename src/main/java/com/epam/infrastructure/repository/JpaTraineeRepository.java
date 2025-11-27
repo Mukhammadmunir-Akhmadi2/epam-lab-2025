@@ -2,6 +2,7 @@ package com.epam.infrastructure.repository;
 
 import com.epam.application.repository.TraineeRepository;
 import com.epam.infrastructure.daos.TraineeDao;
+import com.epam.infrastructure.mappers.TraineeFullMapper;
 import com.epam.infrastructure.mappers.TraineeMapper;
 import com.epam.model.Trainee;
 import jakarta.persistence.EntityManager;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class JpaTraineeRepository implements TraineeRepository {
 
     private final TraineeMapper traineeMapper;
+    private final TraineeFullMapper traineeFullMapper;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -27,24 +29,27 @@ public class JpaTraineeRepository implements TraineeRepository {
     @Transactional
     @Override
     public Trainee save(Trainee trainee) {
-        TraineeDao traineeDao = traineeMapper.toDao(trainee);
+        TraineeDao traineeDao = traineeFullMapper.toDao(trainee);
         if (traineeDao.getUserId() == null) {
             entityManager.persist(traineeDao);
-            return traineeMapper.toModel(traineeDao);
+            return traineeFullMapper.toModel(traineeDao);
         }
         TraineeDao existing = entityManager.find(TraineeDao.class, traineeDao.getUserId());
         traineeMapper.updateFields(traineeDao, existing);
-        return traineeMapper.toModel(entityManager.merge(existing));
+        return traineeFullMapper.toModel(entityManager.merge(existing));
     }
 
     @Override
     public Optional<Trainee> findById(String traineeId) {
-        return Optional.ofNullable(
-                traineeMapper
-                        .toModel(
-                                entityManager.find(TraineeDao.class, UUID.fromString(traineeId))
-                        )
-        );
+        try {
+            TraineeDao traineeDao = entityManager
+                    .createNamedQuery("TraineeDao.findById", TraineeDao.class)
+                    .setParameter("userId", UUID.fromString(traineeId))
+                    .getSingleResult();
+            return Optional.ofNullable(traineeFullMapper.toModel(traineeDao));
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -54,7 +59,7 @@ public class JpaTraineeRepository implements TraineeRepository {
                     .createNamedQuery("TraineeDao.findByUserName", TraineeDao.class)
                     .setParameter("username", userName)
                     .getSingleResult();
-            return Optional.ofNullable(traineeMapper.toModel(traineeDao));
+            return Optional.ofNullable(traineeFullMapper.toModel(traineeDao));
         } catch (NoResultException e) {
             return Optional.empty();
         }

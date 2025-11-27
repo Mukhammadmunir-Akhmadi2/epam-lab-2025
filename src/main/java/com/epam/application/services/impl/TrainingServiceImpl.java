@@ -1,31 +1,31 @@
 package com.epam.application.services.impl;
 
-import com.epam.application.exceptions.TrainingNotFoundException;
+import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.repository.TrainingRepository;
 import com.epam.application.services.TrainingService;
 import com.epam.model.Training;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Validated
+@RequiredArgsConstructor
 public class TrainingServiceImpl implements TrainingService {
     private static final Logger log = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
     private final TrainingRepository trainingRepository;
 
-    public TrainingServiceImpl(@Qualifier("jpaTrainingRepository") TrainingRepository trainingRepository) {
-        this.trainingRepository = trainingRepository;
-    }
-
     @Transactional
     @Override
-    public Training createTraining(Training training) {
+    public Training createTraining(@Valid Training training) {
         Training saved = trainingRepository.save(training);
         log.info("Created training id={} name={}", saved.getTrainingId(), saved.getTrainingName());
         return saved;
@@ -34,7 +34,7 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public Training getTrainingById(String trainingId) {
         return trainingRepository.findById(trainingId)
-                .orElseThrow(() -> new TrainingNotFoundException("Training not found id=" + trainingId));
+                .orElseThrow(() -> new ResourceNotFoundException("Training not found id=" + trainingId));
     }
 
     @Override

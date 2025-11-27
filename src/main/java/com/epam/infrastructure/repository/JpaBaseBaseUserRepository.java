@@ -9,8 +9,10 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -35,12 +37,19 @@ public class JpaBaseBaseUserRepository implements BaseUserRepository {
     }
 
     @Override
+    @Transactional
     public User save(User user) {
         UserDao userDao = userMapper.toDao(user);
 
         if (userDao.getUserId() == null) {
             throw new IllegalArgumentException("Cannot update user without ID");
         }
-        return userMapper.toModel(entityManager.merge(userDao));
+
+        UserDao existing = entityManager.find(UserDao.class, UUID.fromString(user.getUserId()));
+        if (existing == null) throw new IllegalArgumentException("User not found");
+
+        userMapper.updateFields(userDao, existing);
+
+        return userMapper.toModel(entityManager.merge(existing));
     }
 }

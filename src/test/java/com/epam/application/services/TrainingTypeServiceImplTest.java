@@ -3,7 +3,6 @@ package com.epam.application.services;
 import com.epam.application.repository.TrainingTypeRepository;
 import com.epam.application.services.impl.TrainingTypeServiceImpl;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
-import com.epam.infrastructure.utils.TrainingTypeUtils;
 import com.epam.model.TrainingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,20 +35,18 @@ class TrainingTypeServiceImplTest {
 
     @Test
     void findOrCreate_shouldReturnExistingType() {
-        String typeName = "cardio";
+        String typeName = "CARDIO";
 
-        String normalizedType = TrainingTypeUtils.normalize(typeName);
-
-        when(trainingTypeRepository.findByType(TrainingTypeEnum.valueOf(normalizedType)))
+        when(trainingTypeRepository.findByType(TrainingTypeEnum.valueOf(typeName)))
                 .thenReturn(Optional.of(existingType));
 
-        TrainingType result = trainingTypeService.getTrainingType(TrainingTypeEnum.valueOf(normalizedType));
+        TrainingType result = trainingTypeService.getTrainingType(TrainingTypeEnum.valueOf(typeName));
 
         assertNotNull(result);
         assertEquals(TrainingTypeEnum.CARDIO, result.getTrainingType());
 
         verify(trainingTypeRepository, times(1))
-                .findByType(TrainingTypeEnum.valueOf(normalizedType));
+                .findByType(TrainingTypeEnum.valueOf(typeName));
         verify(trainingTypeRepository, never()).save(any());
     }
 }

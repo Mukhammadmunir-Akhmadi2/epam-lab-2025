@@ -1,86 +1,44 @@
 package com.epam.infrastructure.config;
 
+import com.epam.application.repository.TrainingTypeRepository;
+import com.epam.infrastructure.enums.TrainingTypeEnum;
+import com.epam.infrastructure.logging.TransactionIdFilter;
+import com.epam.model.TrainingType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import javax.sql.DataSource;
-import java.util.Properties;
 
 @Configuration
-@ComponentScan(basePackages = "com.epam")
-@PropertySource("classpath:application.properties")
-@EnableTransactionManagement
 public class AppConfig {
+    private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
 
     @Bean
-    @Profile("test")
-    public DataSource h2DataSource() {
-        DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName("org.h2.Driver");
-        ds.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
-        ds.setUsername("sa");
-        ds.setPassword("");
-        return ds;
+    public FilterRegistrationBean<TransactionIdFilter> txIdFilter(TransactionIdFilter filter) {
+        FilterRegistrationBean<TransactionIdFilter> reg = new FilterRegistrationBean<>(filter);
+        reg.setOrder(1);
+        reg.addUrlPatterns("/*");
+        return reg;
     }
 
     @Bean
     @Profile("!test")
-    public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/gym_db");
-        dataSource.setUsername("postgres");
-        dataSource.setPassword("4999");
-
-        return dataSource;
-    }
-
-    @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(
-            DataSource dataSource,
-            HibernateJpaVendorAdapter jpaVendorAdapter
-    ) {
-        LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
-        factory.setDataSource(dataSource);
-        factory.setPackagesToScan("com.epam.infrastructure.daos");
-        factory.setJpaVendorAdapter(jpaVendorAdapter);
-        factory.setJpaProperties(jpaProperties());
-        return factory;
-    }
-
-    @Bean
-    public HibernateJpaVendorAdapter jpaVendorAdapter() {
-        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-
-        vendorAdapter.setShowSql(true);
-        vendorAdapter.setGenerateDdl(true);
-
-        return vendorAdapter;
-    }
-
-    private Properties jpaProperties() {
-        Properties properties = new Properties();
-
-        properties.setProperty("hibernate.hbm2ddl.auto", "create");
-        properties.setProperty("hibernate.highlight_sql", "true");
-        properties.setProperty("hibernate.hbm2ddl.import_files", "database/seed.sql");
-
-        return properties;
-    }
-
-    @Bean
-    public JpaTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
-        return transactionManager;
+    public CommandLineRunner trainingTypeInitializer(TrainingTypeRepository trainingTypeRepository) {
+        return args -> {
+            for (TrainingTypeEnum typeEnum : TrainingTypeEnum.values()) {
+                trainingTypeRepository.findByType(typeEnum).ifPresentOrElse(
+                        existing -> logger.info("Training type {} already exists. Skipping creation.", typeEnum),
+                        () -> {
+                            TrainingType trainingType = new TrainingType();
+                            trainingType.setTrainingType(typeEnum);
+                            trainingTypeRepository.save(trainingType);
+                            logger.info("Saved training type: {}", typeEnum);
+                        }
+                );
+            }
+        };
     }
 }

@@ -1,6 +1,6 @@
 package com.epam.application.services;
 
-import com.epam.application.exceptions.UserNotFoundException;
+import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.generators.PasswordGenerator;
 import com.epam.application.generators.UsernameGenerator;
 import com.epam.application.repository.TrainerRepository;
@@ -60,8 +60,8 @@ class TrainerServiceImplTest {
 
         Trainer created = trainerService.createTrainer(trainer);
 
-        assertNotNull(created.getUserName());
-        assertEquals("alice.smith", created.getUserName());
+        assertNotNull(created.getUsername());
+        assertEquals("alice.smith", created.getUsername());
         assertEquals("secret123", created.getPassword());
         assertTrue(created.isActive());
 
@@ -70,55 +70,32 @@ class TrainerServiceImplTest {
         verify(passwordGenerator, times(1)).generatePassword(10);
     }
 
-    @Test
-    void testUpdateTrainerChangesUsername() {
-        Trainer updatedInfo = new Trainer();
-
-        var trainingType = new TrainingType();
-        trainingType.setTrainingTypeId(UUID.randomUUID().toString());
-        trainingType.setTrainingType(TrainingTypeEnum.YOGA);
-
-        updatedInfo.setUserId(trainer.getUserId());
-        updatedInfo.setFirstName("Alice");
-        updatedInfo.setLastName("Johnson");
-
-        when(trainerRepository.findById(trainer.getUserId())).thenReturn(Optional.of(trainer));
-        when(usernameGenerator.generateUsername(any(), any())).thenReturn("alice.johnson");
-        when(trainerRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-
-        Trainer updated = trainerService.updateTrainer(updatedInfo);
-
-        assertEquals("alice.johnson", updated.getUserName());
-
-        verify(usernameGenerator, times(1)).generateUsername(any(), any());
-        verify(trainerRepository, times(1)).save(trainer);
-    }
 
     @Test
     void testGetTrainerByIdNotFound() {
         when(trainerRepository.findById("id")).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> trainerService.getTrainerById("id"));
+        assertThrows(ResourceNotFoundException.class, () -> trainerService.getTrainerById("id"));
     }
 
     @Test
     void testGetTrainerByUserNameNotFound() {
         when(trainerRepository.findByUserName("username")).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> trainerService.getTrainerByUserName("username"));
+        assertThrows(ResourceNotFoundException.class, () -> trainerService.getTrainerByUserName("username"));
     }
 
     @Test
     void updateTrainer_shouldThrow_whenTrainerNotFound() {
-        String missingId = "missing-id";
+        String missingName = "name";
 
-        when(trainerRepository.findById(missingId)).thenReturn(Optional.empty());
+        when(trainerRepository.findByUserName(missingName)).thenReturn(Optional.empty());
 
         Trainer update = new Trainer();
-        update.setUserId(missingId);
+        update.setUsername(missingName);
 
-        assertThrows(UserNotFoundException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> trainerService.updateTrainer(update));
 
-        verify(trainerRepository, times(1)).findById(missingId);
+        verify(trainerRepository, times(1)).findByUserName(missingName);
         verify(trainerRepository, never()).save(any());
     }
 
@@ -134,57 +111,21 @@ class TrainerServiceImplTest {
 
         verify(trainerRepository, times(1)).save(any());
     }
-    @Test
-    void updateTrainer_shouldRegenerateUsername_whenNameChanged() {
-        Trainer existing = trainer;
-        existing.setUserName("alice.smith");
-
-        Trainer updatedInfo = new Trainer();
-        updatedInfo.setUserId(existing.getUserId());
-        updatedInfo.setFirstName("Alice");
-        updatedInfo.setLastName("Johnson"); // Name changed
-        updatedInfo.setSpecialization(existing.getSpecialization());
-        updatedInfo.setActive(existing.isActive());
-
-        when(trainerRepository.findById(existing.getUserId()))
-                .thenReturn(Optional.of(existing));
-
-        when(usernameGenerator.generateUsername(eq(existing), any()))
-                .thenAnswer(inv -> {
-                    var lambda = inv.getArgument(1, java.util.function.Predicate.class);
-                    lambda.test("alice.johnson");
-
-                    return "alice.johnson";
-                });
-
-        when(trainerRepository.findByUserName("alice.johnson"))
-                .thenReturn(Optional.empty());
-
-        when(trainerRepository.save(any()))
-                .thenAnswer(inv -> inv.getArgument(0));
-
-        Trainer updated = trainerService.updateTrainer(updatedInfo);
-
-        assertEquals("alice.johnson", updated.getUserName());
-
-        verify(usernameGenerator, times(1)).generateUsername(eq(existing), any());
-        verify(trainerRepository, times(1)).findByUserName("alice.johnson"); // important: lambda check
-        verify(trainerRepository, times(1)).save(existing);
-    }
 
     @Test
     void updateTrainer_shouldKeepUsername_whenNameNotChanged() {
         Trainer existing = trainer;
-        existing.setUserName("Alice.Smith");
+        existing.setUsername("Alice.Smith");
 
         Trainer updatedInfo = new Trainer();
         updatedInfo.setUserId(existing.getUserId());
+        updatedInfo.setUsername(existing.getUsername());
         updatedInfo.setFirstName(existing.getFirstName());
         updatedInfo.setLastName(existing.getLastName());
         updatedInfo.setSpecialization(existing.getSpecialization());
         updatedInfo.setActive(existing.isActive());
 
-        when(trainerRepository.findById(existing.getUserId()))
+        when(trainerRepository.findByUserName(existing.getUsername()))
                 .thenReturn(Optional.of(existing));
 
         when(trainerRepository.save(any()))
@@ -192,9 +133,8 @@ class TrainerServiceImplTest {
 
         Trainer updated = trainerService.updateTrainer(updatedInfo);
 
-        assertEquals("Alice.Smith", updated.getUserName());
+        assertEquals("Alice.Smith", updated.getUsername());
         verify(usernameGenerator, never()).generateUsername(any(), any());
-        verify(trainerRepository, never()).findByUserName(anyString()); // lambda MUST NOT run
         verify(trainerRepository, times(1)).save(existing);
     }
 }

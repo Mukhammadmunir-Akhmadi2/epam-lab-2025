@@ -1,5 +1,6 @@
 package com.epam.model;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +16,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class Trainer extends User {
+    @NotNull
     private TrainingType specialization;
     private Set<Trainee> trainees = new HashSet<>();
 }

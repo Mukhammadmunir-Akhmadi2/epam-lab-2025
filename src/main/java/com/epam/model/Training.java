@@ -15,8 +15,10 @@ import java.time.LocalDateTime;
 public class Training {
     private String trainingId;
 
+    @NotNull
     private Trainee trainee;
 
+    @NotNull
     private Trainer trainer;
 
     @NotBlank
