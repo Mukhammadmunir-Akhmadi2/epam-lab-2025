@@ -1,7 +1,7 @@
 package com.epam.application.services;
 
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.Training;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -11,7 +11,7 @@ public interface TrainingQueryService {
             LocalDate from,
             LocalDate to,
             String trainerUsername,
-            String trainingType
+            TrainingTypeEnum trainingType
     );
     List<Training> getTrainerTrainings(
             String trainerUsername,

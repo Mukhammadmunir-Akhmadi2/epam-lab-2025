@@ -1,7 +1,7 @@
 package com.epam.application.services;
 
 import com.epam.application.exceptions.InvalidCredentialException;
-import com.epam.application.exceptions.UserNotFoundException;
+import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.provider.AuthProviderService;
 import com.epam.application.repository.BaseUserRepository;
 import com.epam.application.services.impl.BaseUserAuthServiceImpl;
@@ -35,7 +35,7 @@ class BaseUserAuthServiceImplTest {
     @BeforeEach
     void setUp() {
         user = new User();
-        user.setUserName("john");
+        user.setUsername("john");
         user.setPassword("oldPass");
         user.setActive(true);
     }
@@ -56,7 +56,7 @@ class BaseUserAuthServiceImplTest {
         when(baseUserRepository.findByUserName("unknown"))
                 .thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> baseUserAuthService.toggleActive("unknown"));
     }
 
@@ -74,7 +74,7 @@ class BaseUserAuthServiceImplTest {
     void changePassword_shouldThrowException_WhenUserNotFound() {
         when(baseUserRepository.findByUserName("unknown")).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> baseUserAuthService.changePassword("unknown", "old", "new"));
     }
 
@@ -102,7 +102,7 @@ class BaseUserAuthServiceImplTest {
     void authenticateUser_shouldThrowException_WhenUserNotFound() {
         when(baseUserRepository.findByUserName("unknown")).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> baseUserAuthService.authenticateUser("unknown", "anything"));
     }
 

@@ -30,9 +30,9 @@ class TrainerQueryServiceImplTest {
     @BeforeEach
     void setUp() {
         Trainer t1 = new Trainer();
-        t1.setUserName("trainer1");
+        t1.setUsername("trainer1");
         Trainer t2 = new Trainer();
-        t2.setUserName("trainer2");
+        t2.setUsername("trainer2");
 
         trainers = Arrays.asList(t1, t2);
     }
@@ -48,8 +48,8 @@ class TrainerQueryServiceImplTest {
 
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertTrue(result.stream().anyMatch(t -> t.getUserName().equals("trainer1")));
-        assertTrue(result.stream().anyMatch(t -> t.getUserName().equals("trainer2")));
+        assertTrue(result.stream().anyMatch(t -> t.getUsername().equals("trainer1")));
+        assertTrue(result.stream().anyMatch(t -> t.getUsername().equals("trainer2")));
 
         verify(trainerQueryRepository, times(1))
                 .findUnassignedTrainersByTraineeUsername(traineeUsername);

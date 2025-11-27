@@ -7,17 +7,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class InMemoryAuthProviderService implements AuthProviderService {
 
+
     private User authenticatedUser;
 
     @Override
     public boolean isAuthenticated(String username) {
-        return authenticatedUser != null && authenticatedUser.getUserName().equals(username);
+        return authenticatedUser != null && authenticatedUser.getUsername().equals(username);
     }
 
     @Override
     public String setAuthenticatedUser(User user) {
         this.authenticatedUser = user;
-        return "User " + user.getUserName() + " authenticated successfully.";
+        return "User " + user.getUsername() + " authenticated successfully.";
 
     }
 

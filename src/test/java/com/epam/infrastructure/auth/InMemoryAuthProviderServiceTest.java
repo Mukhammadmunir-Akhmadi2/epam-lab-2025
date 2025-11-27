@@ -1,6 +1,5 @@
 package com.epam.infrastructure.auth;
 
-
 import com.epam.application.provider.AuthProviderService;
 import com.epam.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +19,7 @@ class InMemoryAuthProviderServiceTest {
     @Test
     void setAuthenticatedUser_shouldStoreUserAndReturnSuccessMessage() {
         User user = new User();
-        user.setUserName("john");
+        user.setUsername("john");
 
         String result = authProviderService.setAuthenticatedUser(user);
 
@@ -31,7 +30,7 @@ class InMemoryAuthProviderServiceTest {
     @Test
     void isAuthenticated_shouldReturnTrue_WhenUserMatchesAuthenticatedUser() {
         User user = new User();
-        user.setUserName("john");
+        user.setUsername("john");
         authProviderService.setAuthenticatedUser(user);
 
         assertTrue(authProviderService.isAuthenticated("john"));
@@ -45,7 +44,7 @@ class InMemoryAuthProviderServiceTest {
     @Test
     void isAuthenticated_shouldReturnFalse_WhenUsernamesDoNotMatch() {
         User user = new User();
-        user.setUserName("john");
+        user.setUsername("john");
         authProviderService.setAuthenticatedUser(user);
 
         assertFalse(authProviderService.isAuthenticated("doe"));
@@ -54,7 +53,7 @@ class InMemoryAuthProviderServiceTest {
     @Test
     void logout_shouldClearAuthenticatedUser() {
         User user = new User();
-        user.setUserName("john");
+        user.setUsername("john");
         authProviderService.setAuthenticatedUser(user);
 
         authProviderService.logout();

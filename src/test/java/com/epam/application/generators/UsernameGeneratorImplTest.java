@@ -1,6 +1,5 @@
 package com.epam.application.generators;
 
-
 import com.epam.application.generators.impl.UsernameGeneratorImpl;
 import com.epam.model.Trainee;
 import com.epam.model.User;

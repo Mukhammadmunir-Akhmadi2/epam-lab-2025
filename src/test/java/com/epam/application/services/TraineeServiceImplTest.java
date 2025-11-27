@@ -1,6 +1,6 @@
 package com.epam.application.services;
 
-import com.epam.application.exceptions.UserNotFoundException;
+import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.generators.PasswordGenerator;
 import com.epam.application.generators.UsernameGenerator;
 import com.epam.application.repository.TraineeRepository;
@@ -48,7 +48,7 @@ class TraineeServiceImplTest {
         defaultTrainee.setLastName("Smith");
         defaultTrainee.setDateOfBirth(LocalDate.of(2000, 1, 1));
         defaultTrainee.setAddress("123 Main St");
-        defaultTrainee.setUserName("Alice.Smith");
+        defaultTrainee.setUsername("Alice.Smith");
         defaultTrainee.setActive(true);
     }
 
@@ -61,8 +61,8 @@ class TraineeServiceImplTest {
 
         Trainee created = traineeService.createTrainee(defaultTrainee);
 
-        assertNotNull(created.getUserName());
-        assertEquals("john.doe", created.getUserName());
+        assertNotNull(created.getUsername());
+        assertEquals("john.doe", created.getUsername());
         assertEquals("secret123", created.getPassword());
         assertTrue(created.isActive());
 
@@ -83,29 +83,30 @@ class TraineeServiceImplTest {
     @Test
     void testGetTraineeByIdNotFound() {
         when(traineeRepository.findById("id")).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> traineeService.getTraineeById("id"));
+        assertThrows(ResourceNotFoundException.class, () -> traineeService.getTraineeById("id"));
     }
 
     @Test
     void testGetTraineeByUserNameNotFound() {
         when(traineeRepository.findByUserName("username")).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> traineeService.getTraineeByUserName("username"));
+        assertThrows(ResourceNotFoundException.class, () -> traineeService.getTraineeByUserName("username"));
     }
 
     @Test
     void testUpdateTraineeNoUsernameChange() {
         Trainee updatedInfo = new Trainee();
         updatedInfo.setUserId(defaultTrainee.getUserId());
+        updatedInfo.setUsername(defaultTrainee.getUsername());
         updatedInfo.setFirstName(defaultTrainee.getFirstName());
         updatedInfo.setLastName(defaultTrainee.getLastName());
         updatedInfo.setAddress("789 Pine St");
 
-        when(traineeRepository.findById(defaultTrainee.getUserId())).thenReturn(Optional.of(defaultTrainee));
+        when(traineeRepository.findByUserName(defaultTrainee.getUsername())).thenReturn(Optional.of(defaultTrainee));
         when(traineeRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         Trainee updated = traineeService.updateTrainee(updatedInfo);
 
-        assertEquals(defaultTrainee.getUserName(), updated.getUserName());
+        assertEquals(defaultTrainee.getUsername(), updated.getUsername());
         assertEquals("789 Pine St", updated.getAddress());
 
         verify(usernameGenerator, never()).generateUsername(any(), any());
@@ -133,81 +134,26 @@ class TraineeServiceImplTest {
     }
 
     @Test
-    void updateTrainee_shouldRegenerateUsername_whenNameChanged() {
-        Trainee updatedInfo = new Trainee();
-        updatedInfo.setUserId(defaultTrainee.getUserId());
-        updatedInfo.setFirstName("Alice");
-        updatedInfo.setLastName("Johnson"); // name changed
-        updatedInfo.setAddress("456 Oak Ave");
-
-        when(traineeRepository.findById(defaultTrainee.getUserId()))
-                .thenReturn(Optional.of(defaultTrainee));
-        when(usernameGenerator.generateUsername(any(), any()))
-                .thenReturn("alice.johnson");
-        when(traineeRepository.save(any()))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-
-        Trainee updated = traineeService.updateTrainee(updatedInfo);
-
-        assertEquals("alice.johnson", updated.getUserName());
-        assertEquals("456 Oak Ave", updated.getAddress());
-
-        verify(usernameGenerator, times(1)).generateUsername(any(), any());
-        verify(traineeRepository, times(1)).save(defaultTrainee);
-    }
-
-    @Test
     void updateTrainee_shouldNotChangeUsername_whenNameNotChanged() {
         Trainee updatedInfo = new Trainee();
         updatedInfo.setUserId(defaultTrainee.getUserId());
+        updatedInfo.setUsername(defaultTrainee.getUsername());
         updatedInfo.setFirstName(defaultTrainee.getFirstName());
         updatedInfo.setLastName(defaultTrainee.getLastName());
         updatedInfo.setAddress("789 Pine St");
 
-        when(traineeRepository.findById(defaultTrainee.getUserId()))
+        when(traineeRepository.findByUserName(defaultTrainee.getUsername()))
                 .thenReturn(Optional.of(defaultTrainee));
         when(traineeRepository.save(any()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         Trainee updated = traineeService.updateTrainee(updatedInfo);
 
-        assertEquals(defaultTrainee.getUserName(), updated.getUserName());
+        assertEquals(defaultTrainee.getUsername(), updated.getUsername());
         assertEquals("789 Pine St", updated.getAddress());
 
         verify(usernameGenerator, never()).generateUsername(any(), any());
         verify(traineeRepository, times(1)).save(defaultTrainee);
-    }
-
-    @Test
-    void testUpdateTraineeChangesUsername() {
-        Trainee stored = new Trainee();
-        stored.setUserId(defaultTrainee.getUserId());
-        stored.setFirstName(defaultTrainee.getFirstName());
-        stored.setLastName(defaultTrainee.getLastName());
-        stored.setAddress(defaultTrainee.getAddress());
-        stored.setDateOfBirth(defaultTrainee.getDateOfBirth());
-        stored.setUserName(defaultTrainee.getUserName());
-        stored.setActive(defaultTrainee.isActive());
-
-        Trainee updatedInfo = new Trainee();
-        updatedInfo.setUserId(defaultTrainee.getUserId());
-        updatedInfo.setFirstName("Alice");
-        updatedInfo.setLastName("Johnson"); // changed
-        updatedInfo.setAddress("456 Oak Ave");
-
-        when(traineeRepository.findById(defaultTrainee.getUserId()))
-                .thenReturn(Optional.of(stored));   // <- NEW instance
-
-        when(usernameGenerator.generateUsername(any(), any()))
-                .thenReturn("alice.johnson");
-
-        when(traineeRepository.save(any()))
-                .thenAnswer(inv -> inv.getArgument(0));
-
-        Trainee updated = traineeService.updateTrainee(updatedInfo);
-
-        assertEquals("alice.johnson", updated.getUserName());
-        verify(usernameGenerator, times(1)).generateUsername(any(), any());
     }
 
 }
