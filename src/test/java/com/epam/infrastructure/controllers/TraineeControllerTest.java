@@ -167,7 +167,7 @@ class TraineeControllerTest {
 
         Trainer t1 = new Trainer();
         Trainer t2 = new Trainer();
-        when(trainerQueryService.getUnassignedTrainers(username)).thenReturn(List.of(t1, t2));
+        when(trainerQueryService.getUnassignedActiveTrainers(username)).thenReturn(List.of(t1, t2));
         when(trainerMapper.toTrainerBriefDtoList(List.of(t1, t2))).thenReturn(List.of(new TrainerBriefDto(), new TrainerBriefDto()));
 
         mockMvc.perform(get("/trainees/{username}/unassigned-trainers", username))

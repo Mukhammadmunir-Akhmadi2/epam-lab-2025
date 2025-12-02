@@ -13,6 +13,7 @@ import com.epam.infrastructure.dtos.AuthDto;
 import com.epam.infrastructure.mappers.TraineeFullMapper;
 import com.epam.infrastructure.mappers.TraineeMapper;
 import com.epam.infrastructure.mappers.TrainerMapper;
+import com.epam.model.Trainee;
 import com.epam.model.Trainer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,42 +37,39 @@ public class TraineeControllerImpl implements TraineeController {
 
     @Override
     public ResponseEntity<AuthDto> register(TraineeRegistrationRequest trainee) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                traineeMapper.toAuthDto(
-                        traineeService.createTrainee(
-                                traineeMapper.toModel(trainee)
-                        )
-                )
-        );
+
+        Trainee saved = traineeService.createTrainee(traineeMapper.toModel(trainee));
+        AuthDto authDto = traineeMapper.toAuthDto(saved);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(authDto);
     }
 
     @Override
     public ResponseEntity<TraineeResponseDto> updateProfile(TraineeDto trainee) {
         authProvider.ensureAuthenticated(trainee.getUsername());
 
-        return ResponseEntity.ok().body(
-                traineeFullMapper.toTraineeResponseDto(
-                        traineeService.updateTrainee(
-                                traineeMapper.toModel(trainee)
-                        )
-                )
-        );
+        Trainee updated = traineeService.updateTrainee(traineeMapper.toModel(trainee));
+        TraineeResponseDto responseDto = traineeFullMapper.toTraineeResponseDto(updated);
+
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @Override
     public ResponseEntity<TraineeResponseDto> getProfile(String username) {
         authProvider.ensureAuthenticated(username);
-        return ResponseEntity.ok().body(
-                traineeFullMapper.toTraineeResponseDto(
-                        traineeService.getTraineeByUserName(username)
-                )
-        );
+
+        Trainee trainee = traineeService.getTraineeByUserName(username);
+        TraineeResponseDto responseDto = traineeFullMapper.toTraineeResponseDto(trainee);
+
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @Override
     public ResponseEntity<Void> deleteProfile(String username) {
+
         authProvider.ensureAuthenticated(username);
         traineeService.deleteTrainee(username);
+
         return ResponseEntity.noContent().build();
     }
 
@@ -79,11 +77,10 @@ public class TraineeControllerImpl implements TraineeController {
     public ResponseEntity<List<TrainerBriefDto>> getUnassignedActiveTrainers(String username) {
         authProvider.ensureAuthenticated(username);
 
-        return ResponseEntity.ok().body(
-                trainerMapper.toTrainerBriefDtoList(
-                        trainerQueryService.getUnassignedTrainers(username)
-                )
-        );
+        List<Trainer> trainers = trainerQueryService.getUnassignedActiveTrainers(username);
+        List<TrainerBriefDto> trainerBriefDtos = trainerMapper.toTrainerBriefDtoList(trainers);
+
+        return ResponseEntity.ok().body(trainerBriefDtos);
     }
 
     @Override
@@ -93,12 +90,10 @@ public class TraineeControllerImpl implements TraineeController {
         List<Trainer> assignedTrainers = trainers.stream()
                 .map(trainerService::getTrainerByUserName)
                 .toList();
+        List<Trainer> updatedTrainers = traineeService.updateTraineeTrainers(username, assignedTrainers);
+        List<TrainerBriefDto> trainerBriefDtos = trainerMapper.toTrainerBriefDtoList(updatedTrainers);
 
 
-        return ResponseEntity.ok().body(
-                trainerMapper.toTrainerBriefDtoList(
-                        traineeService.updateTraineeTrainers(username, assignedTrainers)
-                )
-        );
+        return ResponseEntity.ok().body(trainerBriefDtos);
     }
 }

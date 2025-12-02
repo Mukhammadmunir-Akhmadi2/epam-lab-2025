@@ -4,6 +4,7 @@ import com.epam.application.services.TrainingTypeService;
 import com.epam.infrastructure.controllers.TrainingTypeController;
 import com.epam.infrastructure.dtos.TrainingTypeDto;
 import com.epam.infrastructure.mappers.TrainingTypeMapper;
+import com.epam.model.TrainingType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,11 +21,10 @@ public class TrainingTypeControllerImpl implements TrainingTypeController {
     @Override
     public ResponseEntity<List<TrainingTypeDto>> getTrainingTypes() {
         trainingTypeService.getAllTrainingTypes();
-        return ResponseEntity.ok()
-                .body(
-                        trainingTypeMapper.toDtoList(
-                                        trainingTypeService.getAllTrainingTypes()
-                                )
-                );
+
+        List<TrainingType> trainingTypes = trainingTypeService.getAllTrainingTypes();
+        List<TrainingTypeDto> responseDto = trainingTypeMapper.toDtoList(trainingTypes);
+
+        return ResponseEntity.ok().body(responseDto);
     }
 }

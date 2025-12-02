@@ -5,5 +5,5 @@ import com.epam.model.Trainer;
 import java.util.List;
 
 public interface TrainerQueryRepository {
-    List<Trainer> findUnassignedTrainersByTraineeUsername(String traineeUsername);
+    List<Trainer> findUnassignedActiveTrainersByTraineeUsername(String traineeUsername);
 }

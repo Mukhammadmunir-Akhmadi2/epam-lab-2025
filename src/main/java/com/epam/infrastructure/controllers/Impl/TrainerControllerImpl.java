@@ -10,6 +10,7 @@ import com.epam.infrastructure.dtos.TrainerResponseDto;
 import com.epam.infrastructure.dtos.AuthDto;
 import com.epam.infrastructure.mappers.TrainerFullMapper;
 import com.epam.infrastructure.mappers.TrainerMapper;
+import com.epam.model.Trainer;
 import com.epam.model.TrainingType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,13 +29,12 @@ public class TrainerControllerImpl implements TrainerController {
 
     @Override
     public ResponseEntity<AuthDto> register(TrainerRegistrationRequest trainer) {
-        TrainingType specialization = trainingTypeService.getTrainingType(trainer.getSpecialization());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                trainerMapper.toAuthDto(
-                        trainerService.createTrainer(trainerMapper.toModel(trainer, specialization))
-                )
-        );
+        TrainingType specialization = trainingTypeService.getTrainingType(trainer.getSpecialization());
+        Trainer saved = trainerService.createTrainer(trainerMapper.toModel(trainer, specialization));
+        AuthDto authDto = trainerMapper.toAuthDto(saved);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(authDto);
     }
 
     @Override
@@ -42,23 +42,19 @@ public class TrainerControllerImpl implements TrainerController {
         authProvider.ensureAuthenticated(trainer.getUsername());
 
         TrainingType trainingType = trainingTypeService.getTrainingType(trainer.getSpecialization());
+        Trainer updated = trainerService.updateTrainer(trainerMapper.toModel(trainer, trainingType));
+        TrainerResponseDto responseDto = trainerFullMapper.toTrainerResponseDto(updated);
 
-        return ResponseEntity.ok().body(
-                trainerFullMapper.toTrainerResponseDto(
-                        trainerService.updateTrainer(
-                                trainerMapper.toModel(trainer, trainingType))
-                )
-        );
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @Override
     public ResponseEntity<TrainerResponseDto> getProfile(String username) {
         authProvider.ensureAuthenticated(username);
 
-        return ResponseEntity.ok().body(
-                trainerFullMapper.toTrainerResponseDto(
-                        trainerService.getTrainerByUserName(username)
-                )
-        );
+        Trainer trainer = trainerService.getTrainerByUserName(username);
+        TrainerResponseDto responseDto = trainerFullMapper.toTrainerResponseDto(trainer);
+
+        return ResponseEntity.ok().body(responseDto);
     }
 }

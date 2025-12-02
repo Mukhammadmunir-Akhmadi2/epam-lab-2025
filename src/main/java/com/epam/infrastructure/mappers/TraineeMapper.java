@@ -29,6 +29,8 @@ public interface TraineeMapper {
     @Mapping(source = "dateOfBirth", target = "dateOfBirth", qualifiedByName = "parseLocalDate")
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "trainers", ignore = true)
+    @Mapping(target = "username", ignore = true)
+    @Mapping(target = "active", ignore = true)
     Trainee toModel(TraineeRegistrationRequest request);
 
     @Mapping(target = "userId", ignore = true)

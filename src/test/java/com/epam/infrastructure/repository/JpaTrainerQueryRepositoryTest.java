@@ -92,25 +92,25 @@ class JpaTrainerQueryRepositoryTest {
     }
 
     @Test
-    void findUnassignedTrainersByTraineeUsername_shouldReturnAllActiveUnassignedTrainers() {
-        List<Trainer> available = trainerQueryRepository.findUnassignedTrainersByTraineeUsername(trainee.getUsername());
+    void findUnassignedTrainersByTraineeUsername_shouldReturnAllActiveUnassignedActiveTrainers() {
+        List<Trainer> available = trainerQueryRepository.findUnassignedActiveTrainersByTraineeUsername(trainee.getUsername());
         assertEquals(2, available.size());
         assertTrue(available.stream().anyMatch(t -> t.getUsername().equals(trainer1.getUsername())));
         assertTrue(available.stream().anyMatch(t -> t.getUsername().equals(trainer2.getUsername())));
     }
 
     @Test
-    void findUnassignedTrainersByTraineeUsername_shouldReturnEmpty_whenTraineeDoesNotExist() {
-        List<Trainer> result = trainerQueryRepository.findUnassignedTrainersByTraineeUsername("non_existing_user");
+    void findUnassignedActiveTrainersByTraineeUsername_shouldReturnEmpty_whenTraineeDoesNotExist() {
+        List<Trainer> result = trainerQueryRepository.findUnassignedActiveTrainersByTraineeUsername("non_existing_user");
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void findUnassignedTrainersByTraineeUsername_shouldExcludeTrainersAlreadyAssignedToTrainee() {
+    void findUnassignedTrainersByTraineeUsername_shouldExcludeActiveTrainersAlreadyAssignedToTrainee() {
         trainer1.getTrainees().add(trainee);
         trainerRepository.save(trainer1);
 
-        List<Trainer> available = trainerQueryRepository.findUnassignedTrainersByTraineeUsername(trainee.getUsername());
+        List<Trainer> available = trainerQueryRepository.findUnassignedActiveTrainersByTraineeUsername(trainee.getUsername());
         assertEquals(2, available.size());
         assertEquals(trainer2.getUsername(), available.get(1).getUsername());
     }

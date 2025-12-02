@@ -15,7 +15,7 @@ public class TrainerQueryServiceImpl implements TrainerQueryService {
     private final TrainerQueryRepository trainerQueryRepository;
 
     @Override
-    public List<Trainer> getUnassignedTrainers(String traineeUsername) {
-        return trainerQueryRepository.findUnassignedTrainersByTraineeUsername(traineeUsername);
+    public List<Trainer> getUnassignedActiveTrainers(String traineeUsername) {
+        return trainerQueryRepository.findUnassignedActiveTrainersByTraineeUsername(traineeUsername);
     }
 }

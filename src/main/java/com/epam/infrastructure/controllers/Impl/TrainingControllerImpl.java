@@ -14,6 +14,7 @@ import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.mappers.TrainingMapper;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
+import com.epam.model.Training;
 import com.epam.model.TrainingType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -51,21 +52,20 @@ public class TrainingControllerImpl implements TrainingController {
     public ResponseEntity<List<TrainerTrainingDto>> getTraineeTrainings(String username, LocalDate from, LocalDate to, String trainerUsername, TrainingTypeEnum trainingType) {
         authProviderService.ensureAuthenticated(username);
 
-        return ResponseEntity.ok().body(
-                trainingMapper.toTrainerTrainingDtoList(
-                        trainingQueryService.getTraineeTrainings(username, from, to, trainerUsername, trainingType)
-                )
-        );
+        List<Training> trainings = trainingQueryService
+                .getTraineeTrainings(username, from, to, trainerUsername, trainingType);
+        List<TrainerTrainingDto> responseDto = trainingMapper.toTrainerTrainingDtoList(trainings);
+
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @Override
     public ResponseEntity<List<TraineeTrainingDto>> getTrainerTrainings(String username, LocalDate from, LocalDate to, String traineeUsername) {
         authProviderService.ensureAuthenticated(username);
 
-        return ResponseEntity.ok().body(
-                trainingMapper.toTraineeTrainingDtoList(
-                        trainingQueryService.getTrainerTrainings(username, from, to, traineeUsername)
-                )
-        );
+        List<Training> trainings = trainingQueryService.getTrainerTrainings(username, from, to, traineeUsername);
+        List<TraineeTrainingDto> responseDto = trainingMapper.toTraineeTrainingDtoList(trainings);
+
+        return ResponseEntity.ok().body(responseDto);
     }
 }

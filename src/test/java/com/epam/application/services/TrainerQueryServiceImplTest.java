@@ -38,13 +38,13 @@ class TrainerQueryServiceImplTest {
     }
 
     @Test
-    void getUnassignedTrainers_shouldReturnList() {
+    void getUnassignedActiveTrainers_shouldReturnList() {
         String traineeUsername = "trainee123";
 
-        when(trainerQueryRepository.findUnassignedTrainersByTraineeUsername(traineeUsername))
+        when(trainerQueryRepository.findUnassignedActiveTrainersByTraineeUsername(traineeUsername))
                 .thenReturn(trainers);
 
-        List<Trainer> result = trainerQueryService.getUnassignedTrainers(traineeUsername);
+        List<Trainer> result = trainerQueryService.getUnassignedActiveTrainers(traineeUsername);
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -52,22 +52,22 @@ class TrainerQueryServiceImplTest {
         assertTrue(result.stream().anyMatch(t -> t.getUsername().equals("trainer2")));
 
         verify(trainerQueryRepository, times(1))
-                .findUnassignedTrainersByTraineeUsername(traineeUsername);
+                .findUnassignedActiveTrainersByTraineeUsername(traineeUsername);
     }
 
     @Test
-    void getUnassignedTrainers_shouldReturnEmptyListIfNone() {
+    void getUnassignedActiveTrainers_shouldReturnEmptyListIfNone() {
         String traineeUsername = "trainee456";
 
-        when(trainerQueryRepository.findUnassignedTrainersByTraineeUsername(traineeUsername))
+        when(trainerQueryRepository.findUnassignedActiveTrainersByTraineeUsername(traineeUsername))
                 .thenReturn(List.of());
 
-        List<Trainer> result = trainerQueryService.getUnassignedTrainers(traineeUsername);
+        List<Trainer> result = trainerQueryService.getUnassignedActiveTrainers(traineeUsername);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
 
         verify(trainerQueryRepository, times(1))
-                .findUnassignedTrainersByTraineeUsername(traineeUsername);
+                .findUnassignedActiveTrainersByTraineeUsername(traineeUsername);
     }
 }

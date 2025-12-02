@@ -18,21 +18,27 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     public ResponseEntity<Void> login(AuthDto loginRequest) {
+
         baseUserAuthService.authenticateUser(loginRequest.getUsername(), loginRequest.getPassword());
+
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<Void> changePassword(String username, ChangePasswordRequest request) {
+
         authProvider.ensureAuthenticated(username);
         baseUserAuthService.changePassword(username, request.getOldPassword(), request.getNewPassword());
+
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<Void> toggleActive(String username) {
+
         authProvider.ensureAuthenticated(username);
         baseUserAuthService.toggleActive(username);
+
         return ResponseEntity.ok().build();
     }
 }

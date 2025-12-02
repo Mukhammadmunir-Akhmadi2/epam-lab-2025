@@ -23,7 +23,7 @@ public class JpaTrainerQueryRepository implements TrainerQueryRepository {
     private final TrainerMapper trainerMapper;
 
     @Override
-    public List<Trainer> findUnassignedTrainersByTraineeUsername(String traineeUsername) {
+    public List<Trainer> findUnassignedActiveTrainersByTraineeUsername(String traineeUsername) {
         TraineeDao traineeDao;
         try {
             traineeDao = entityManager.createNamedQuery("TraineeDao.findByUserName", TraineeDao.class)
