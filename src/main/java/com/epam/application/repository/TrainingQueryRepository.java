@@ -1,5 +1,6 @@
 package com.epam.application.repository;
 
+import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.Training;
 
 import java.time.LocalDate;
@@ -11,7 +12,7 @@ public interface TrainingQueryRepository {
             LocalDate from,
             LocalDate to,
             String trainerName,
-            String trainingType
+            TrainingTypeEnum trainingType
     );
     List<Training> findTrainingsByTrainerUsernameWithFilters(
             String trainerUsername,

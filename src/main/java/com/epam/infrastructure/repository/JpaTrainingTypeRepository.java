@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -45,5 +46,12 @@ public class JpaTrainingTypeRepository implements TrainingTypeRepository {
             return trainingTypeMapper.toModel(trainingTypeDao);
         }
         return trainingTypeMapper.toModel(entityManager.merge(trainingTypeDao));
+    }
+
+    @Override
+    public List<TrainingType> findAll() {
+        return trainingTypeMapper.toModelList(
+                entityManager.createQuery("from TrainingTypeDao", TrainingTypeDao.class).getResultList()
+        );
     }
 }

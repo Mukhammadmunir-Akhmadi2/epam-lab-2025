@@ -1,116 +1,90 @@
 package com.epam.infrastructure.mappers;
 
-import com.epam.infrastructure.daos.TraineeDao;
-import com.epam.infrastructure.daos.TrainerDao;
 import com.epam.infrastructure.daos.TrainingDao;
+import com.epam.infrastructure.dtos.TraineeTrainingDto;
+import com.epam.infrastructure.dtos.TrainerTrainingDto;
+import com.epam.infrastructure.dtos.TrainingDto;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
 import com.epam.model.Training;
+import com.epam.model.TrainingType;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.UUID;
 
 @Mapper(
-        uses = {CommonMapper.class},
+        uses = {CommonMapper.class, TraineeMapper.class, TrainerMapper.class},
         componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
-public abstract class TrainingMapper {
-
-    @Autowired
-    protected TrainingTypeMapper trainingTypeMapper;
+public interface TrainingMapper {
 
     @Mapping(source = "trainingId", target = "trainingId", qualifiedByName = "uuidToString")
     @Mapping(source = "trainer", target = "trainer", qualifiedByName = "toTrainer")
     @Mapping(source = "trainee", target = "trainee", qualifiedByName = "toTrainee")
-    public abstract Training toFullModel(TrainingDao trainingDao);
+    @Named("toFullModel")
+    Training toFullModel(TrainingDao trainingDao);
 
     @Mapping(source = "trainingId", target = "trainingId", qualifiedByName = "uuidToString")
     @Mapping(source = "trainer", target = "trainer", ignore = true)
     @Mapping(source = "trainee", target = "trainee", ignore = true)
     @Named("toModel")
-    public abstract Training toModel(TrainingDao trainingDao);
+    Training toModel(TrainingDao trainingDao);
 
     @Mapping(source = "trainingId", target = "trainingId", qualifiedByName = "stringToUuid")
     @Mapping(source = "trainer", target = "trainer", qualifiedByName = "toTrainerDao")
     @Mapping(source = "trainee", target = "trainee", qualifiedByName = "toTraineeDao")
-    public abstract TrainingDao toFullDao(Training training);
-
-    @Mapping(source = "trainingId", target = "trainingId", qualifiedByName = "stringToUuid")
-    @Mapping(source = "trainer", target = "trainer", qualifiedByName = "toTrainerDao")
-    @Mapping(source = "trainee", target = "trainee", ignore = true)
-    public abstract TrainingDao toDao(Training training);
+    TrainingDao toFullDao(Training training);
 
     @IterableMapping(qualifiedByName = "toModel")
-    public abstract List<Training> toModelList(List<TrainingDao> trainingDaoList);
+    List<Training> toModelList(List<TrainingDao> trainingDaoList);
+
+    @IterableMapping(qualifiedByName = "toFullModel")
+    List<Training> toFullModelList(List<TrainingDao> trainingDaoList);
 
     @Mapping(target = "trainee", ignore = true)
     @Mapping(target = "trainer", ignore = true)
     @Mapping(target = "trainingId", ignore = true)
-    public abstract void updateFields(TrainingDao model, @MappingTarget TrainingDao dao);
+    void updateFields(TrainingDao model, @MappingTarget TrainingDao dao);
 
-    @Named("toTrainer")
-    public Trainer toTrainer(TrainerDao trainerDao) {
-        if (trainerDao == null) {
-            return null;
-        }
-        Trainer trainer = new Trainer();
-        trainer.setUserId(trainerDao.getUserId().toString());
-        trainer.setUserName(trainerDao.getUserName());
-        trainer.setFirstName(trainerDao.getFirstName());
-        trainer.setLastName(trainerDao.getLastName());
-        trainer.setSpecialization(
-                trainingTypeMapper.toModel(trainerDao.getSpecialization())
-        );
-        return trainer;
+    default Training toModel(Trainee trainee, Trainer trainer, TrainingType trainingType, TrainingDto request) {
+        Training training = toModel(new TrainingDao());
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
+        training.setTrainingType(trainingType);
+
+        training.setTrainingName(request.getName());
+        training.setDate(CommonMapper.parseLocalDateTime(request.getDate()));
+        training.setDuration(request.getDuration());
+        return training;
     }
 
-    @Named("toTrainerDao")
-    public TrainerDao toTrainerDao(Trainer trainer) {
-        if (trainer == null) {
-            return null;
-        }
-        TrainerDao trainerDao = new TrainerDao();
-        trainerDao.setUserId(UUID.fromString(trainer.getUserId()));
-        trainerDao.setUserName(trainer.getUserName());
-        trainerDao.setFirstName(trainer.getFirstName());
-        trainerDao.setLastName(trainer.getLastName());
-        trainerDao.setSpecialization(
-                trainingTypeMapper.toDao(trainer.getSpecialization())
-        );
-        return trainerDao;
+    default List<TrainerTrainingDto> toTrainerTrainingDtoList(List<Training> traineeTrainings) {
+        return traineeTrainings.stream().map(training -> {
+            TrainerTrainingDto dto = new TrainerTrainingDto();
+            dto.setName(training.getTrainingName());
+            dto.setDate(CommonMapper.formatLocalDateTime(training.getDate()));
+            dto.setDuration(training.getDuration());
+            dto.setType(training.getTrainingType().getTrainingType());
+            dto.setTrainerUsername(training.getTrainee().getUsername());
+            return dto;
+        }).toList();
     }
 
-    @Named("toTrainee")
-    public Trainee toTrainee(TraineeDao traineeDao) {
-        if (traineeDao == null) {
-            return null;
-        }
-        Trainee trainee = new Trainee();
-        trainee.setUserId(traineeDao.getUserId().toString());
-        trainee.setUserName(traineeDao.getUserName());
-        trainee.setFirstName(traineeDao.getFirstName());
-        trainee.setLastName(traineeDao.getLastName());
-        return trainee;
-    }
-
-    @Named("toTraineeDao")
-    public TraineeDao toTraineeDao(Trainee trainee) {
-        if (trainee == null) {
-            return null;
-        }
-        TraineeDao traineeDao = new TraineeDao();
-        traineeDao.setUserId(UUID.fromString(trainee.getUserId()));
-        traineeDao.setUserName(trainee.getUserName());
-        traineeDao.setFirstName(trainee.getFirstName());
-        traineeDao.setLastName(trainee.getLastName());
-        return traineeDao;
+    default List<TraineeTrainingDto> toTraineeTrainingDtoList(List<Training> trainerTrainings) {
+        return trainerTrainings.stream().map(training -> {
+            TraineeTrainingDto dto = new TraineeTrainingDto();
+            dto.setName(training.getTrainingName());
+            dto.setDate(CommonMapper.formatLocalDateTime(training.getDate()));
+            dto.setDuration(training.getDuration());
+            dto.setType(training.getTrainingType().getTrainingType());
+            dto.setTraineeUsername(training.getTrainee().getUsername());
+            return dto;
+        }).toList();
     }
 }

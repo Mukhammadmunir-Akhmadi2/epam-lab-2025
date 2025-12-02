@@ -22,7 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @NamedQuery(name = "UserDao.findByUsername",
-        query = "SELECT u FROM UserDao u WHERE u.userName = :username"
+        query = "SELECT u FROM UserDao u WHERE u.username = :username"
 )
 public class UserDao {
     @Id
@@ -37,7 +37,7 @@ public class UserDao {
     protected String lastName;
 
     @Column(name = "username", nullable = false, unique = true, length = 100)
-    protected String userName;
+    protected String username;
 
     @Column(name = "password", nullable = false, length = 18)
     protected String password;
