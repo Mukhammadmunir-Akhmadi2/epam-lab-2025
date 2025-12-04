@@ -1,8 +1,8 @@
 package com.epam.infrastructure.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -16,26 +16,26 @@ import java.util.Properties;
 @EnableTransactionManagement
 public class JpaConfig {
 
-    @Bean
-    @Profile("test")
-    public DataSource h2DataSource() {
-        DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName("org.h2.Driver");
-        ds.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
-        ds.setUsername("sa");
-        ds.setPassword("");
-        return ds;
-    }
+    @Value("${spring.custom-datasource.url}")
+    private String dbUrl;
+
+    @Value("${spring.custom-datasource.username}")
+    private String dbUser;
+
+    @Value("${spring.custom-datasource.password:}") // optional for H2
+    private String dbPassword;
+
+    @Value("${spring.custom-datasource.driver-class-name}")
+    private String dbDriver;
 
     @Bean
-    @Profile("!test")
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/gym_db");
-        dataSource.setUsername("postgres");
-        dataSource.setPassword("4999");
+        dataSource.setDriverClassName(dbDriver);
+        dataSource.setUrl(dbUrl);
+        dataSource.setUsername(dbUser);
+        dataSource.setPassword(dbPassword);
 
         return dataSource;
     }

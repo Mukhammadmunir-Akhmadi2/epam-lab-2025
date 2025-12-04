@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-@ActiveProfiles("test")
+@ActiveProfiles("dev")
 @SpringBootTest
 class JpaTraineeRepositoryTest {
 
@@ -68,7 +68,7 @@ class JpaTraineeRepositoryTest {
     @Test
     void findById_shouldReturnTrainee() {
         Trainee saved = traineeRepository.save(trainee);
-        Optional<Trainee> found = traineeRepository.findById(saved.getUserId().toString());
+        Optional<Trainee> found = traineeRepository.findById(saved.getUserId());
         assertTrue(found.isPresent());
         assertEquals("john.doe", found.get().getUsername());
     }
@@ -154,7 +154,7 @@ class JpaTraineeRepositoryTest {
 
         Trainee updated = traineeRepository.save(saved);
 
-        Optional<Trainee> found = traineeRepository.findById(updated.getUserId().toString());
+        Optional<Trainee> found = traineeRepository.findById(updated.getUserId());
 
         assertTrue(found.isPresent());
         assertEquals("UpdatedJohn", found.get().getFirstName());

@@ -38,8 +38,10 @@ public class TrainerControllerImpl implements TrainerController {
     }
 
     @Override
-    public ResponseEntity<TrainerResponseDto> updateProfile(TrainerDto trainer) {
-        authProvider.ensureAuthenticated(trainer.getUsername());
+    public ResponseEntity<TrainerResponseDto> updateProfile(String username, TrainerDto trainer) {
+        authProvider.ensureAuthenticated(username);
+
+        trainer.setUsername(username);
 
         TrainingType trainingType = trainingTypeService.getTrainingType(trainer.getSpecialization());
         Trainer updated = trainerService.updateTrainer(trainerMapper.toModel(trainer, trainingType));

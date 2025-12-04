@@ -98,7 +98,7 @@ class TraineeControllerTest {
         when(traineeService.updateTrainee(traineeModel)).thenReturn(updatedTrainee);
         when(traineeFullMapper.toTraineeResponseDto(updatedTrainee)).thenReturn(responseDto);
 
-        mockMvc.perform(put("/trainees")
+        mockMvc.perform(put("/trainees/" + traineeDto.getUsername())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(traineeDto)))
                 .andExpect(status().isOk())

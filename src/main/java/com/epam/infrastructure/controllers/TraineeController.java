@@ -47,10 +47,15 @@ public interface TraineeController {
     )
     ResponseEntity<AuthDto> register(@Valid @RequestBody TraineeRegistrationRequest trainee);
 
-    @PutMapping
+    @PutMapping("/{username}")
     @Operation(
             summary = "Update trainee profile",
             description = "Updates trainee personal information such as name, address, and activity state.",
+            parameters = @Parameter(
+                    name = "username",
+                    description = "Username of the trainee",
+                    required = true
+            ),
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Updated trainee information",
                     required = true,
@@ -61,7 +66,7 @@ public interface TraineeController {
                     @ApiResponse(responseCode = "404", description = "Trainee not found")
             }
     )
-    ResponseEntity<TraineeResponseDto> updateProfile(@Valid @RequestBody TraineeDto trainee);
+    ResponseEntity<TraineeResponseDto> updateProfile(@PathVariable String username, @Valid @RequestBody TraineeDto trainee);
 
     @GetMapping("/{username}")
     @Operation(

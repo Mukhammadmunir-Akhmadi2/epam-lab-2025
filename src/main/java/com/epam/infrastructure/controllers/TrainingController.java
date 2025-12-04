@@ -26,7 +26,7 @@ import java.util.List;
 @Tag(name = "Training Management", description = "Endpoints for managing and retrieving trainings")
 public interface TrainingController {
 
-    @PostMapping("/trainee/{username}/trainer/{trainerUsername}/trainings")
+    @PostMapping("/trainee/{username}/trainer/{trainerUsername}")
     @Operation(
             summary = "Add new training",
             description = "Creates a training for a specific trainee with a specific trainer.",
