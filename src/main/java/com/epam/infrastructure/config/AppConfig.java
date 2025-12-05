@@ -25,7 +25,7 @@ public class AppConfig {
     }
 
     @Bean
-    @Profile("prod")
+    @Profile("local")
     public CommandLineRunner trainingTypeInitializer(TrainingTypeRepository trainingTypeRepository) {
         return args -> {
             for (TrainingTypeEnum typeEnum : TrainingTypeEnum.values()) {

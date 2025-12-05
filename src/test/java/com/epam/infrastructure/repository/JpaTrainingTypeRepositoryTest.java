@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @SpringBootTest
 class JpaTrainingTypeRepositoryTest {
 

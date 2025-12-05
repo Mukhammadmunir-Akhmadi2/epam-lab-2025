@@ -19,7 +19,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @SpringBootTest
 class TrainerMapperTest {
 

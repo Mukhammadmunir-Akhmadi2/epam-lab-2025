@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @SpringBootTest
 class TrainingMapperTest {
 

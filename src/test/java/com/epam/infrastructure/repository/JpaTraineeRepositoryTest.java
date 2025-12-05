@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @SpringBootTest
 class JpaTraineeRepositoryTest {
 

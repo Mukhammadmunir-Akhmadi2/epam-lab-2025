@@ -18,7 +18,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @SpringBootTest
 class TrainerFullMapperTest {
 
