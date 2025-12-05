@@ -105,7 +105,7 @@ class TrainerControllerTest {
         when(trainerFullMapper.toTrainerResponseDto(any()))
                 .thenReturn(responseDto);
 
-        mockMvc.perform(put("/trainers")
+        mockMvc.perform(put("/trainers/" + dto.getUsername())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
@@ -160,7 +160,7 @@ class TrainerControllerTest {
     void updateProfile_ValidationFailure_ShouldReturnBadRequest() throws Exception {
         TrainerDto dto = new TrainerDto(); // missing required fields → triggers @Valid
 
-        mockMvc.perform(put("/trainers")
+        mockMvc.perform(put("/trainers/" + dto.getUsername())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());

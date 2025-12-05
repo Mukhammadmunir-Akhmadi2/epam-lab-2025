@@ -42,10 +42,17 @@ public interface TrainerController {
     );
 
 
-    @PutMapping
+    @PutMapping("/{username}")
     @Operation(
             summary = "Update trainer profile",
             description = "Updates trainer personal info and active status. Specialization is read-only.",
+            parameters = {
+                    @Parameter(
+                            name = "username",
+                            description = "Username of the trainer",
+                            required = true
+                    )
+            },
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Updated trainer information",
                     required = true,
@@ -58,7 +65,7 @@ public interface TrainerController {
             }
     )
     ResponseEntity<TrainerResponseDto> updateProfile(
-            @Valid @RequestBody TrainerDto trainer
+            @PathVariable String username, @Valid @RequestBody TrainerDto trainer
     );
 
 

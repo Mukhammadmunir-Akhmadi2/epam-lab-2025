@@ -68,7 +68,7 @@ class TrainingControllerTest {
         when(trainingMapper.toModel(trainee, trainer, trainingType, request)).thenReturn(training);
         when(trainingService.createTraining(training)).thenReturn(training);
 
-        mockMvc.perform(post("/trainings/trainee/{username}/trainer/{trainerUsername}/trainings",
+        mockMvc.perform(post("/trainings/trainee/{username}/trainer/{trainerUsername}",
                         traineeUsername, trainerUsername)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -120,7 +120,7 @@ class TrainingControllerTest {
         doThrow(new UnauthorizedAccess("Not allowed"))
                 .when(authProviderService).ensureAuthenticated(traineeUsername);
 
-        mockMvc.perform(post("/trainings/trainee/{username}/trainer/{trainerUsername}/trainings",
+        mockMvc.perform(post("/trainings/trainee/{username}/trainer/{trainerUsername}",
                         traineeUsername, trainerUsername)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -145,7 +145,7 @@ class TrainingControllerTest {
         when(traineeService.getTraineeByUserName(traineeUsername))
                 .thenThrow(new ResourceNotFoundException("Trainee not found"));
 
-        mockMvc.perform(post("/trainings/trainee/{username}/trainer/{trainerUsername}/trainings",
+        mockMvc.perform(post("/trainings/trainee/{username}/trainer/{trainerUsername}",
                         traineeUsername, trainerUsername)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -162,7 +162,7 @@ class TrainingControllerTest {
 
         TrainingDto invalidRequest = new TrainingDto(); // missing required fields
 
-        mockMvc.perform(post("/trainings/trainee/{username}/trainer/{trainerUsername}/trainings",
+        mockMvc.perform(post("/trainings/trainee/{username}/trainer/{trainerUsername}",
                         traineeUsername, trainerUsername)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))

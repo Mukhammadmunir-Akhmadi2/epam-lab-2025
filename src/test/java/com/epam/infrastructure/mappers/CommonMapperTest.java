@@ -1,15 +1,12 @@
 package com.epam.infrastructure.mappers;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test")
 class CommonMapperTest {
 
     @Test

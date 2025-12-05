@@ -45,8 +45,10 @@ public class TraineeControllerImpl implements TraineeController {
     }
 
     @Override
-    public ResponseEntity<TraineeResponseDto> updateProfile(TraineeDto trainee) {
-        authProvider.ensureAuthenticated(trainee.getUsername());
+    public ResponseEntity<TraineeResponseDto> updateProfile(String username, TraineeDto trainee) {
+        authProvider.ensureAuthenticated(username);
+
+        trainee.setUsername(username);
 
         Trainee updated = traineeService.updateTrainee(traineeMapper.toModel(trainee));
         TraineeResponseDto responseDto = traineeFullMapper.toTraineeResponseDto(updated);
