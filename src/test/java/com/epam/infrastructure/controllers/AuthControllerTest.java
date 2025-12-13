@@ -1,6 +1,5 @@
 package com.epam.infrastructure.controllers;
 
-import com.epam.application.exceptions.InvalidCredentialException;
 import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.exceptions.UnauthorizedAccess;
 import com.epam.application.provider.AuthProviderService;
@@ -8,10 +7,14 @@ import com.epam.application.services.BaseUserAuthService;
 import com.epam.infrastructure.controllers.Impl.AuthControllerImpl;
 import com.epam.infrastructure.dtos.AuthDto;
 import com.epam.infrastructure.dtos.ChangePasswordRequest;
+import com.epam.infrastructure.security.filters.JwtFilter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthControllerImpl.class)
+@AutoConfigureMockMvc(addFilters = false)
 class AuthControllerTest {
 
     @Autowired
@@ -34,16 +38,26 @@ class AuthControllerTest {
     @MockitoBean
     private AuthProviderService authProvider;
 
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JwtFilter jwtFilter;
+
     @Test
     void login_ShouldReturnOk() throws Exception {
         AuthDto request = new AuthDto();
         request.setUsername("user");
         request.setPassword("pass");
 
+        when(baseUserAuthService.authenticateUser("user", "pass")).thenReturn("token123");
+
+
         mockMvc.perform(post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string("token123"));
 
         verify(baseUserAuthService).authenticateUser("user", "pass");
     }
@@ -54,7 +68,7 @@ class AuthControllerTest {
         request.setOldPassword("old");
         request.setNewPassword("new123");
 
-        doNothing().when(authProvider).ensureAuthenticated("user");
+        doNothing().when(authProvider).validateCurrentUser("user");
 
         mockMvc.perform(put("/users/user/password")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -66,7 +80,7 @@ class AuthControllerTest {
 
     @Test
     void toggleActive_ShouldReturnOk() throws Exception {
-        doNothing().when(authProvider).ensureAuthenticated("user");
+        doNothing().when(authProvider).validateCurrentUser("user");
 
         mockMvc.perform(patch("/users/user/active"))
                 .andExpect(status().isOk());
@@ -80,7 +94,7 @@ class AuthControllerTest {
         request.setUsername("user");
         request.setPassword("wrong");
 
-        doThrow(new InvalidCredentialException("Invalid password"))
+        doThrow(new BadCredentialsException("Invalid password"))
                 .when(baseUserAuthService).authenticateUser("user", "wrong");
 
         mockMvc.perform(post("/users/login")
@@ -98,7 +112,7 @@ class AuthControllerTest {
         request.setNewPassword("new123");
 
         doThrow(new UnauthorizedAccess("Not allowed"))
-                .when(authProvider).ensureAuthenticated("user");
+                .when(authProvider).validateCurrentUser("user");
 
         mockMvc.perform(put("/users/user/password")
                         .contentType(MediaType.APPLICATION_JSON)

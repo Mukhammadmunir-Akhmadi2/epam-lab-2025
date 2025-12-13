@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -35,12 +36,13 @@ public interface AuthController {
                     @ApiResponse(responseCode = "404", description = "User not found")
             }
     )
-    ResponseEntity<Void> login(@Valid @RequestBody AuthDto loginRequest);
+    ResponseEntity<String> login(@Valid @RequestBody AuthDto loginRequest);
 
     @PutMapping("/{username}/password")
     @Operation(
             summary = "Change user password",
             description = "Updates the user's password using the old and new password.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = {
                     @Parameter(
                             name = "username",
@@ -66,6 +68,7 @@ public interface AuthController {
     @Operation(
             summary = "Toggle user active status",
             description = "Activates or deactivates a user account.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = {
                     @Parameter(
                             name = "username",

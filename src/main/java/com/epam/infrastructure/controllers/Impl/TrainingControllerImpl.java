@@ -38,7 +38,7 @@ public class TrainingControllerImpl implements TrainingController {
 
     @Override
     public ResponseEntity<Void> addTraining(String username, String trainerUsername, TrainingDto request) {
-        authProviderService.ensureAuthenticated(username);
+        authProviderService.validateCurrentUser(username);
 
         Trainee trainee = traineeService.getTraineeByUserName(username);
         Trainer trainer = trainerService.getTrainerByUserName(trainerUsername);
@@ -50,7 +50,7 @@ public class TrainingControllerImpl implements TrainingController {
 
     @Override
     public ResponseEntity<List<TrainerTrainingDto>> getTraineeTrainings(String username, LocalDate from, LocalDate to, String trainerUsername, TrainingTypeEnum trainingType) {
-        authProviderService.ensureAuthenticated(username);
+        authProviderService.validateCurrentUser(username);
 
         List<Training> trainings = trainingQueryService
                 .getTraineeTrainings(username, from, to, trainerUsername, trainingType);
@@ -61,7 +61,7 @@ public class TrainingControllerImpl implements TrainingController {
 
     @Override
     public ResponseEntity<List<TraineeTrainingDto>> getTrainerTrainings(String username, LocalDate from, LocalDate to, String traineeUsername) {
-        authProviderService.ensureAuthenticated(username);
+        authProviderService.validateCurrentUser(username);
 
         List<Training> trainings = trainingQueryService.getTrainerTrainings(username, from, to, traineeUsername);
         List<TraineeTrainingDto> responseDto = trainingMapper.toTraineeTrainingDtoList(trainings);

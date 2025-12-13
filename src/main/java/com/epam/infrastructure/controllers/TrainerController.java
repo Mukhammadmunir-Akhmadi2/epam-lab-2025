@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,7 @@ public interface TrainerController {
     @Operation(
             summary = "Update trainer profile",
             description = "Updates trainer personal info and active status. Specialization is read-only.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = {
                     @Parameter(
                             name = "username",
@@ -73,6 +75,7 @@ public interface TrainerController {
     @Operation(
             summary = "Get trainer profile",
             description = "Returns full trainer profile along with assigned trainees.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = {
                     @Parameter(
                             name = "username",

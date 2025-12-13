@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public interface TrainingController {
     @Operation(
             summary = "Add new training",
             description = "Creates a training for a specific trainee with a specific trainer.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = {
                     @Parameter(name = "username", description = "Trainee username", required = true),
                     @Parameter(name = "trainerUsername", description = "Trainer username", required = true)
@@ -56,6 +58,7 @@ public interface TrainingController {
     @Operation(
             summary = "Get trainee trainings",
             description = "Retrieves all trainings for a given trainee, optionally filtered by date, trainer, or type.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = {
                     @Parameter(name = "username", description = "Trainee username", required = true),
                     @Parameter(name = "from", description = "Start date filter (optional)"),
@@ -82,6 +85,7 @@ public interface TrainingController {
     @Operation(
             summary = "Get trainer trainings",
             description = "Retrieves all trainings conducted by a given trainer, optionally filtered by date or trainee.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = {
                     @Parameter(name = "username", description = "Trainer username", required = true),
                     @Parameter(name = "from", description = "Start date filter (optional)"),

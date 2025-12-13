@@ -1,6 +1,7 @@
 package com.epam.infrastructure.controllers.Impl;
 
 import com.epam.application.provider.AuthProviderService;
+import com.epam.application.services.RoleService;
 import com.epam.application.services.TrainerService;
 import com.epam.application.services.TrainingTypeService;
 import com.epam.infrastructure.controllers.TrainerController;
@@ -8,8 +9,10 @@ import com.epam.infrastructure.dtos.TrainerDto;
 import com.epam.infrastructure.dtos.TrainerRegistrationRequest;
 import com.epam.infrastructure.dtos.TrainerResponseDto;
 import com.epam.infrastructure.dtos.AuthDto;
+import com.epam.infrastructure.enums.RoleEnum;
 import com.epam.infrastructure.mappers.TrainerFullMapper;
 import com.epam.infrastructure.mappers.TrainerMapper;
+import com.epam.model.Role;
 import com.epam.model.Trainer;
 import com.epam.model.TrainingType;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +27,21 @@ public class TrainerControllerImpl implements TrainerController {
     private final TrainerService trainerService;
     private final TrainingTypeService trainingTypeService;
     private final AuthProviderService authProvider;
+    private final RoleService roleService;
     private final TrainerMapper trainerMapper;
     private final TrainerFullMapper trainerFullMapper;
 
     @Override
     public ResponseEntity<AuthDto> register(TrainerRegistrationRequest trainer) {
 
+        Role trainerRole = roleService.getRole(RoleEnum.TRAINER);
+
         TrainingType specialization = trainingTypeService.getTrainingType(trainer.getSpecialization());
-        Trainer saved = trainerService.createTrainer(trainerMapper.toModel(trainer, specialization));
+
+        Trainer newTrainer = trainerMapper.toModel(trainer, specialization);
+        newTrainer.getRoles().add(trainerRole);
+
+        Trainer saved = trainerService.createTrainer(newTrainer);
         AuthDto authDto = trainerMapper.toAuthDto(saved);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(authDto);
@@ -39,7 +49,7 @@ public class TrainerControllerImpl implements TrainerController {
 
     @Override
     public ResponseEntity<TrainerResponseDto> updateProfile(String username, TrainerDto trainer) {
-        authProvider.ensureAuthenticated(username);
+        authProvider.validateCurrentUser(username);
 
         trainer.setUsername(username);
 
@@ -52,7 +62,7 @@ public class TrainerControllerImpl implements TrainerController {
 
     @Override
     public ResponseEntity<TrainerResponseDto> getProfile(String username) {
-        authProvider.ensureAuthenticated(username);
+        authProvider.validateCurrentUser(username);
 
         Trainer trainer = trainerService.getTrainerByUserName(username);
         TrainerResponseDto responseDto = trainerFullMapper.toTrainerResponseDto(trainer);

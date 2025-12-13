@@ -1,6 +1,7 @@
 package com.epam.infrastructure.controllers.Impl;
 
 import com.epam.application.provider.AuthProviderService;
+import com.epam.application.services.RoleService;
 import com.epam.application.services.TraineeService;
 import com.epam.application.services.TrainerQueryService;
 import com.epam.application.services.TrainerService;
@@ -10,9 +11,11 @@ import com.epam.infrastructure.dtos.TraineeRegistrationRequest;
 import com.epam.infrastructure.dtos.TraineeResponseDto;
 import com.epam.infrastructure.dtos.TrainerBriefDto;
 import com.epam.infrastructure.dtos.AuthDto;
+import com.epam.infrastructure.enums.RoleEnum;
 import com.epam.infrastructure.mappers.TraineeFullMapper;
 import com.epam.infrastructure.mappers.TraineeMapper;
 import com.epam.infrastructure.mappers.TrainerMapper;
+import com.epam.model.Role;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class TraineeControllerImpl implements TraineeController {
     private final TrainerService trainerService;
     private final TrainerQueryService trainerQueryService;
     private final AuthProviderService authProvider;
+    private final RoleService roleService;
     private final TraineeMapper traineeMapper;
     private final TraineeFullMapper traineeFullMapper;
     private final TrainerMapper trainerMapper;
@@ -38,7 +42,11 @@ public class TraineeControllerImpl implements TraineeController {
     @Override
     public ResponseEntity<AuthDto> register(TraineeRegistrationRequest trainee) {
 
-        Trainee saved = traineeService.createTrainee(traineeMapper.toModel(trainee));
+        Role traineeRole = roleService.getRole(RoleEnum.TRAINEE);
+        Trainee newTrainee = traineeMapper.toModel(trainee);
+        newTrainee.getRoles().add(traineeRole);
+
+        Trainee saved = traineeService.createTrainee(newTrainee);
         AuthDto authDto = traineeMapper.toAuthDto(saved);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(authDto);
@@ -46,7 +54,7 @@ public class TraineeControllerImpl implements TraineeController {
 
     @Override
     public ResponseEntity<TraineeResponseDto> updateProfile(String username, TraineeDto trainee) {
-        authProvider.ensureAuthenticated(username);
+        authProvider.validateCurrentUser(username);
 
         trainee.setUsername(username);
 
@@ -58,7 +66,7 @@ public class TraineeControllerImpl implements TraineeController {
 
     @Override
     public ResponseEntity<TraineeResponseDto> getProfile(String username) {
-        authProvider.ensureAuthenticated(username);
+        authProvider.validateCurrentUser(username);
 
         Trainee trainee = traineeService.getTraineeByUserName(username);
         TraineeResponseDto responseDto = traineeFullMapper.toTraineeResponseDto(trainee);
@@ -69,7 +77,7 @@ public class TraineeControllerImpl implements TraineeController {
     @Override
     public ResponseEntity<Void> deleteProfile(String username) {
 
-        authProvider.ensureAuthenticated(username);
+        authProvider.validateCurrentUser(username);
         traineeService.deleteTrainee(username);
 
         return ResponseEntity.noContent().build();
@@ -77,7 +85,7 @@ public class TraineeControllerImpl implements TraineeController {
 
     @Override
     public ResponseEntity<List<TrainerBriefDto>> getUnassignedActiveTrainers(String username) {
-        authProvider.ensureAuthenticated(username);
+        authProvider.validateCurrentUser(username);
 
         List<Trainer> trainers = trainerQueryService.getUnassignedActiveTrainers(username);
         List<TrainerBriefDto> trainerBriefDtos = trainerMapper.toTrainerBriefDtoList(trainers);
@@ -87,7 +95,7 @@ public class TraineeControllerImpl implements TraineeController {
 
     @Override
     public ResponseEntity<List<TrainerBriefDto>> updateTraineeTrainersList(String username, List<String> trainers) {
-        authProvider.ensureAuthenticated(username);
+        authProvider.validateCurrentUser(username);
 
         List<Trainer> assignedTrainers = trainers.stream()
                 .map(trainerService::getTrainerByUserName)

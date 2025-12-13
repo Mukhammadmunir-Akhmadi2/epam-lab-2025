@@ -22,6 +22,7 @@ public interface TrainerMapper {
     //DAO → MODEL
     @Named("toBriefModel")
     @Mapping(target = "trainees", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     Trainer toBriefModel(TrainerDao trainerDao);
 
     default Trainer toModel(TrainerDto trainerDto, TrainingType trainingType) {
@@ -52,6 +53,7 @@ public interface TrainerMapper {
     @Mapping(target = "trainees", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "username", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     void updateFields(TrainerDao model, @MappingTarget TrainerDao dao);
 
 
@@ -73,6 +75,7 @@ public interface TrainerMapper {
     @Mapping(target = "trainees", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     TrainerDao toTrainerDao(Trainer trainer);
 
     @Named("toTrainer")
@@ -81,6 +84,7 @@ public interface TrainerMapper {
     @Mapping(target = "trainees", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     Trainer toTrainer(TrainerDao dao);
 
     @Named("mapTrainers")

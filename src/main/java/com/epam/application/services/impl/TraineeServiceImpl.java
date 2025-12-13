@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -25,12 +26,13 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class TraineeServiceImpl implements TraineeService {
-    private static final Logger log = LoggerFactory.getLogger(TraineeServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TraineeServiceImpl.class);
 
     private final TraineeRepository traineeRepository;
     private final BaseUserRepository baseUserRepository;
     private final UsernameGenerator usernameGenerator;
     private final PasswordGenerator passwordGenerator;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Transactional
@@ -38,14 +40,18 @@ public class TraineeServiceImpl implements TraineeService {
     public Trainee createTrainee(@Valid Trainee trainee) {
         String username = usernameGenerator
                 .generateUsername(trainee, name -> baseUserRepository.findByUserName(name).isPresent());
-        String password = passwordGenerator.generatePassword(10);
+        String generatedPassword = passwordGenerator.generatePassword(10);
 
         trainee.setUsername(username);
-        trainee.setPassword(password);
+        trainee.setPassword(passwordEncoder.encode(generatedPassword));
         trainee.setActive(true);
 
         Trainee saved = traineeRepository.save(trainee);
-        log.info("Created trainee id={} username={}", saved.getUserId(), saved.getUsername());
+
+        LOGGER.info("Created trainee id={} username={}", saved.getUserId(), saved.getUsername());
+
+        saved.setPassword(generatedPassword);
+
         return saved;
     }
 
@@ -64,7 +70,7 @@ public class TraineeServiceImpl implements TraineeService {
 
         Trainee updated = traineeRepository.save(existing);
 
-        log.info("Updated trainee id={} username={}", updated.getUserId(), updated.getUsername());
+        LOGGER.info("Updated trainee id={} username={}", updated.getUserId(), updated.getUsername());
         return updated;
     }
 
@@ -72,7 +78,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public void deleteTrainee(String traineeId) {
         traineeRepository.delete(traineeId);
-        log.info("Permanently deleted trainee id={}", traineeId);
+        LOGGER.info("Permanently deleted trainee id={}", traineeId);
     }
 
     @Override
@@ -98,7 +104,7 @@ public class TraineeServiceImpl implements TraineeService {
 
         trainee.setTrainers(new HashSet<>(trainers));
         Trainee saved = traineeRepository.save(trainee);
-        log.info("Updated trainers for trainee username={} trainerCount={}", traineeUsername, trainers.size());
+        LOGGER.info("Updated trainers for trainee username={} trainerCount={}", traineeUsername, trainers.size());
 
         return new ArrayList<>(saved.getTrainers());
     }

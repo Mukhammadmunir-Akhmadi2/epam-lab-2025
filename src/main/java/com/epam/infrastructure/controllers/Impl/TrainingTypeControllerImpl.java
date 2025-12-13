@@ -20,7 +20,6 @@ public class TrainingTypeControllerImpl implements TrainingTypeController {
 
     @Override
     public ResponseEntity<List<TrainingTypeDto>> getTrainingTypes() {
-        trainingTypeService.getAllTrainingTypes();
 
         List<TrainingType> trainingTypes = trainingTypeService.getAllTrainingTypes();
         List<TrainingTypeDto> responseDto = trainingTypeMapper.toDtoList(trainingTypes);

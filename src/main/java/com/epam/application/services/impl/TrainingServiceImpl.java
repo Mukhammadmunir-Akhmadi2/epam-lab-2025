@@ -19,7 +19,7 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class TrainingServiceImpl implements TrainingService {
-    private static final Logger log = LoggerFactory.getLogger(TrainingServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
     private final TrainingRepository trainingRepository;
 
@@ -27,7 +27,7 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public Training createTraining(@Valid Training training) {
         Training saved = trainingRepository.save(training);
-        log.info("Created training id={} name={}", saved.getTrainingId(), saved.getTrainingName());
+        LOGGER.info("Created training id={} name={}", saved.getTrainingId(), saved.getTrainingName());
         return saved;
     }
 

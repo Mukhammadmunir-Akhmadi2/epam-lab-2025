@@ -8,6 +8,7 @@ import com.epam.infrastructure.controllers.Impl.TrainingControllerImpl;
 import com.epam.infrastructure.dtos.*;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.mappers.TrainingMapper;
+import com.epam.infrastructure.security.filters.JwtFilter;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
 import com.epam.model.Training;
@@ -15,8 +16,10 @@ import com.epam.model.TrainingType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,6 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TrainingControllerImpl.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TrainingControllerTest {
 
     @Autowired
@@ -34,13 +38,32 @@ class TrainingControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @MockitoBean private TrainingService trainingService;
-    @MockitoBean private TrainerService trainerService;
-    @MockitoBean private TraineeService traineeService;
-    @MockitoBean private TrainingTypeService trainingTypeService;
-    @MockitoBean private TrainingQueryService trainingQueryService;
-    @MockitoBean private AuthProviderService authProviderService;
-    @MockitoBean private TrainingMapper trainingMapper;
+    @MockitoBean
+    private TrainingService trainingService;
+
+    @MockitoBean
+    private TrainerService trainerService;
+
+    @MockitoBean
+    private TraineeService traineeService;
+
+    @MockitoBean
+    private TrainingTypeService trainingTypeService;
+
+    @MockitoBean
+    private TrainingQueryService trainingQueryService;
+
+    @MockitoBean
+    private AuthProviderService authProviderService;
+
+    @MockitoBean
+    private TrainingMapper trainingMapper;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JwtFilter jwtFilter;
 
     @Test
     void addTraining_ShouldReturnOk() throws Exception {
@@ -60,7 +83,7 @@ class TrainingControllerTest {
         Training training = new Training();
 
         doNothing().when(authProviderService)
-                .ensureAuthenticated(eq(traineeUsername));
+                .validateCurrentUser(eq(traineeUsername));
 
         when(traineeService.getTraineeByUserName(traineeUsername)).thenReturn(trainee);
         when(trainerService.getTrainerByUserName(trainerUsername)).thenReturn(trainer);
@@ -79,7 +102,7 @@ class TrainingControllerTest {
     void getTraineeTrainings_ShouldReturnOk() throws Exception {
         String username = "john.trainee";
 
-        doNothing().when(authProviderService).ensureAuthenticated(username);
+        doNothing().when(authProviderService).validateCurrentUser(username);
         when(trainingQueryService.getTraineeTrainings(username, null, null, null, null))
                 .thenReturn(List.of(new Training()));
         when(trainingMapper.toTrainerTrainingDtoList(anyList()))
@@ -94,7 +117,7 @@ class TrainingControllerTest {
     void getTrainerTrainings_ShouldReturnOk() throws Exception {
         String username = "jane.trainer";
 
-        doNothing().when(authProviderService).ensureAuthenticated(username);
+        doNothing().when(authProviderService).validateCurrentUser(username);
         when(trainingQueryService.getTrainerTrainings(username, null, null, null))
                 .thenReturn(List.of(new Training()));
         when(trainingMapper.toTraineeTrainingDtoList(anyList()))
@@ -118,7 +141,7 @@ class TrainingControllerTest {
         request.setDuration(60);
 
         doThrow(new UnauthorizedAccess("Not allowed"))
-                .when(authProviderService).ensureAuthenticated(traineeUsername);
+                .when(authProviderService).validateCurrentUser(traineeUsername);
 
         mockMvc.perform(post("/trainings/trainee/{username}/trainer/{trainerUsername}",
                         traineeUsername, trainerUsername)
@@ -141,7 +164,7 @@ class TrainingControllerTest {
         request.setName("Morning Yoga");
         request.setDuration(60);
 
-        doNothing().when(authProviderService).ensureAuthenticated(traineeUsername);
+        doNothing().when(authProviderService).validateCurrentUser(traineeUsername);
         when(traineeService.getTraineeByUserName(traineeUsername))
                 .thenThrow(new ResourceNotFoundException("Trainee not found"));
 

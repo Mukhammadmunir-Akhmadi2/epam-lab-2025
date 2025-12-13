@@ -3,6 +3,7 @@ package com.epam.infrastructure.controllers;
 import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.exceptions.UnauthorizedAccess;
 import com.epam.application.provider.AuthProviderService;
+import com.epam.application.services.RoleService;
 import com.epam.application.services.TrainerService;
 import com.epam.application.services.TrainingTypeService;
 import com.epam.infrastructure.controllers.Impl.TrainerControllerImpl;
@@ -10,12 +11,15 @@ import com.epam.infrastructure.dtos.*;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.mappers.TrainerFullMapper;
 import com.epam.infrastructure.mappers.TrainerMapper;
+import com.epam.infrastructure.security.filters.JwtFilter;
 import com.epam.model.Trainer;
 import com.epam.model.TrainingType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TrainerControllerImpl.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TrainerControllerTest {
 
     @Autowired
@@ -39,6 +44,9 @@ class TrainerControllerTest {
     private TrainingTypeService trainingTypeService;
 
     @MockitoBean
+    private RoleService roleService;
+
+    @MockitoBean
     private AuthProviderService authProvider;
 
     @MockitoBean
@@ -46,6 +54,12 @@ class TrainerControllerTest {
 
     @MockitoBean
     private TrainerFullMapper trainerFullMapper;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JwtFilter jwtFilter;
 
     @Test
     void register_ShouldReturnCreated() throws Exception {
@@ -92,7 +106,7 @@ class TrainerControllerTest {
         Trainer trainer = new Trainer();
         TrainerResponseDto responseDto = new TrainerResponseDto();
 
-        doNothing().when(authProvider).ensureAuthenticated(dto.getUsername());
+        doNothing().when(authProvider).validateCurrentUser(dto.getUsername());
 
         when(trainingTypeService.getTrainingType(any(TrainingTypeEnum.class)))
                 .thenReturn(specialization);
@@ -118,7 +132,7 @@ class TrainerControllerTest {
         Trainer trainer = new Trainer();
         TrainerResponseDto responseDto = new TrainerResponseDto();
 
-        doNothing().when(authProvider).ensureAuthenticated(username);
+        doNothing().when(authProvider).validateCurrentUser(username);
 
         when(trainerService.getTrainerByUserName(username)).thenReturn(trainer);
         when(trainerFullMapper.toTrainerResponseDto(any()))
@@ -133,7 +147,7 @@ class TrainerControllerTest {
         String username = "john.doe";
 
         doThrow(new UnauthorizedAccess("Not allowed"))
-                .when(authProvider).ensureAuthenticated(username);
+                .when(authProvider).validateCurrentUser(username);
 
         mockMvc.perform(get("/trainers/" + username))
                 .andExpect(status().isUnauthorized())
@@ -145,7 +159,7 @@ class TrainerControllerTest {
     void getProfile_NotFound_ShouldReturnNotFound() throws Exception {
         String username = "unknown";
 
-        doNothing().when(authProvider).ensureAuthenticated(username);
+        doNothing().when(authProvider).validateCurrentUser(username);
 
         when(trainerService.getTrainerByUserName(username))
                 .thenThrow(new ResourceNotFoundException("Trainer not found"));

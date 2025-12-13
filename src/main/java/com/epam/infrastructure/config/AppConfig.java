@@ -1,8 +1,11 @@
 package com.epam.infrastructure.config;
 
+import com.epam.application.repository.RoleRepository;
 import com.epam.application.repository.TrainingTypeRepository;
+import com.epam.infrastructure.enums.RoleEnum;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.logging.TransactionIdFilter;
+import com.epam.model.Role;
 import com.epam.model.TrainingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +17,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class AppConfig {
-    private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppConfig.class);
 
     @Bean
     public FilterRegistrationBean<TransactionIdFilter> txIdFilter(TransactionIdFilter filter) {
@@ -26,16 +29,27 @@ public class AppConfig {
 
     @Bean
     @Profile("local")
-    public CommandLineRunner trainingTypeInitializer(TrainingTypeRepository trainingTypeRepository) {
+    public CommandLineRunner trainingTypeInitializer(TrainingTypeRepository trainingTypeRepository, RoleRepository roleRepository) {
         return args -> {
             for (TrainingTypeEnum typeEnum : TrainingTypeEnum.values()) {
                 trainingTypeRepository.findByType(typeEnum).ifPresentOrElse(
-                        existing -> logger.info("Training type {} already exists. Skipping creation.", typeEnum),
+                        existing -> LOGGER.info("Training type {} already exists. Skipping creation.", typeEnum),
                         () -> {
                             TrainingType trainingType = new TrainingType();
                             trainingType.setTrainingType(typeEnum);
                             trainingTypeRepository.save(trainingType);
-                            logger.info("Saved training type: {}", typeEnum);
+                            LOGGER.info("Saved training type: {}", typeEnum);
+                        }
+                );
+            }
+            for (RoleEnum roleEnum : RoleEnum.values()) {
+                roleRepository.findByName(roleEnum).ifPresentOrElse(
+                        existing -> LOGGER.info("Role {} already exists. Skipping creation.", roleEnum),
+                        () -> {
+                            Role role = new Role();
+                            role.setRole(roleEnum);
+                            roleRepository.save(role);
+                            LOGGER.info("Saved role: {}", roleEnum);
                         }
                 );
             }

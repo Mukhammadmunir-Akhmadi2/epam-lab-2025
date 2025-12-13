@@ -12,7 +12,7 @@ public class ChangePasswordRequest {
     @Schema(description = "Old password", example = "password123")
     private String oldPassword;
     @NotBlank
-    @Size(min = 6, max = 18, message = "Password must be between 6 and 18 characters")
+    @Size(min = 6, max = 60, message = "Password must be between 6 and 60 characters")
     @Schema(description = "New Password", example = "newpassword456")
     private String newPassword;
 }

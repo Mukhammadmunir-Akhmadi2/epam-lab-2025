@@ -6,12 +6,15 @@ import com.epam.infrastructure.controllers.Impl.TrainingTypeControllerImpl;
 import com.epam.infrastructure.dtos.TrainingTypeDto;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.mappers.TrainingTypeMapper;
+import com.epam.infrastructure.security.filters.JwtFilter;
 import com.epam.model.TrainingType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TrainingTypeControllerImpl.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TrainingTypeControllerTest {
 
     @Autowired
@@ -35,6 +39,12 @@ class TrainingTypeControllerTest {
 
     @MockitoBean
     private TrainingTypeMapper trainingTypeMapper;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JwtFilter jwtFilter;
 
 
     @Test

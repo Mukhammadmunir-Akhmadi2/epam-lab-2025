@@ -8,13 +8,14 @@ import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(
-        uses = {CommonMapper.class, TrainerMapper.class, TraineeMapper.class, TrainingTypeMapper.class},
+        uses = {CommonMapper.class, TrainerMapper.class, TraineeMapper.class, TrainingTypeMapper.class, RoleMapper.class},
         componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public interface TrainerFullMapper {
     @Mapping(source = "userId", target = "userId", qualifiedByName = "uuidToString")
     @Mapping(source = "trainees", target = "trainees", qualifiedByName = "mapTrainees")
+    @Mapping(target = "roles", ignore = true)
     Trainer toModel(TrainerDao trainerDao);
 
     @Mapping(source = "userId", target = "userId", qualifiedByName = "stringToUuid")

@@ -21,6 +21,7 @@ public interface TraineeMapper {
     //DAO → MODEL
     @Named("toBriefModel")
     @Mapping(target = "trainers", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     Trainee toBriefModel(TraineeDao traineeDao);
 
     //REQUEST / DTO → MODEL
@@ -56,6 +57,7 @@ public interface TraineeMapper {
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "trainings", ignore = true)
     @Mapping(target = "username", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     void updateFields(TraineeDao model, @MappingTarget TraineeDao dao);
 
     //NAMED MAPPERS
@@ -68,6 +70,7 @@ public interface TraineeMapper {
     @Mapping(target = "trainers", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     TraineeDao toTraineeDao(Trainee trainee);
 
     @Named("toTrainee")
@@ -77,6 +80,7 @@ public interface TraineeMapper {
     @Mapping(target = "trainers", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     Trainee toTrainee(TraineeDao dao);
 
     @Named("mapTrainees")
