@@ -1,11 +1,8 @@
 package com.epam.infrastructure.config;
 
-import com.epam.application.repository.RoleRepository;
 import com.epam.application.repository.TrainingTypeRepository;
-import com.epam.infrastructure.enums.RoleEnum;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.logging.TransactionIdFilter;
-import com.epam.model.Role;
 import com.epam.model.TrainingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +26,7 @@ public class AppConfig {
 
     @Bean
     @Profile("local")
-    public CommandLineRunner trainingTypeInitializer(TrainingTypeRepository trainingTypeRepository, RoleRepository roleRepository) {
+    public CommandLineRunner trainingTypeInitializer(TrainingTypeRepository trainingTypeRepository) {
         return args -> {
             for (TrainingTypeEnum typeEnum : TrainingTypeEnum.values()) {
                 trainingTypeRepository.findByType(typeEnum).ifPresentOrElse(
@@ -39,17 +36,6 @@ public class AppConfig {
                             trainingType.setTrainingType(typeEnum);
                             trainingTypeRepository.save(trainingType);
                             LOGGER.info("Saved training type: {}", typeEnum);
-                        }
-                );
-            }
-            for (RoleEnum roleEnum : RoleEnum.values()) {
-                roleRepository.findByName(roleEnum).ifPresentOrElse(
-                        existing -> LOGGER.info("Role {} already exists. Skipping creation.", roleEnum),
-                        () -> {
-                            Role role = new Role();
-                            role.setRole(roleEnum);
-                            roleRepository.save(role);
-                            LOGGER.info("Saved role: {}", roleEnum);
                         }
                 );
             }

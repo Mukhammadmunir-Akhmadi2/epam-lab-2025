@@ -9,10 +9,12 @@ import com.epam.application.services.TrainerQueryService;
 import com.epam.application.services.TrainerService;
 import com.epam.infrastructure.controllers.Impl.TraineeControllerImpl;
 import com.epam.infrastructure.dtos.*;
+import com.epam.infrastructure.enums.RoleEnum;
 import com.epam.infrastructure.mappers.TraineeFullMapper;
 import com.epam.infrastructure.mappers.TraineeMapper;
 import com.epam.infrastructure.mappers.TrainerMapper;
 import com.epam.infrastructure.security.filters.JwtFilter;
+import com.epam.model.Role;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
 import org.junit.jupiter.api.Test;
@@ -80,9 +82,13 @@ class TraineeControllerTest {
         authDto.setUsername("john.doe");
         authDto.setPassword("pass123");
 
+        Role traineeRole = new Role();
+        traineeRole.setRole(RoleEnum.TRAINEE);
+
         when(traineeMapper.toModel(request)).thenReturn(new Trainee());
         when(traineeService.createTrainee(any())).thenReturn(new Trainee());
         when(traineeMapper.toAuthDto(any())).thenReturn(authDto);
+        when(roleService.getRole(any())).thenReturn(traineeRole);
 
         mockMvc.perform(post("/trainees")
                         .contentType(MediaType.APPLICATION_JSON)

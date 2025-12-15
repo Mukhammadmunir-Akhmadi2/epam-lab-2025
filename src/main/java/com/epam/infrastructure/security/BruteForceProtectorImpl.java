@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
@@ -30,6 +31,8 @@ public class BruteForceProtectorImpl implements BruteForceProtector {
 
     @Value("${app.security.brute-force-protection.file}")
     private String storagePath;
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     private final Map<String, LoginAttempt> attempts = new ConcurrentHashMap<>();
 
@@ -78,7 +81,7 @@ public class BruteForceProtectorImpl implements BruteForceProtector {
     }
 
     @PostConstruct
-    private synchronized void load() {
+    private void load() {
         try {
             File storage = new File(storagePath);
             if (!storage.exists()) return;
@@ -86,24 +89,25 @@ public class BruteForceProtectorImpl implements BruteForceProtector {
             Map<String, LoginAttempt> loaded = mapper.readValue(storage, new TypeReference<>() {});
             attempts.putAll(loaded);
             LOGGER.info("BruteForceProtectorService loaded {} records from storage", loaded.size());
-        } catch (Exception ex) {
-            LOGGER.warn("BruteForceProtectorService failed to load records from storage");
-            LOGGER.debug("Stack trace: ", ex);
+        } catch (NullPointerException ex) {
+            LOGGER.warn("BruteForceProtectorService storage path is not set, skipping load operation");
+        } catch (JacksonException ex) {
+            LOGGER.warn("BruteForceProtectorService failed to load records from storage", ex);
         }
     }
 
     @PreDestroy
-    private synchronized void save() {
+    private void save() {
         try {
             File storage = new File(storagePath);
 
-            ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(storage, attempts);
 
             LOGGER.info("BruteForceProtectorService saved {} records to storage", attempts.size());
-        } catch (Exception ex) {
-            LOGGER.warn("BruteForceProtectorService failed to save records to storage");
-            LOGGER.debug("Stack trace: ", ex);
+        } catch (NullPointerException ex) {
+            LOGGER.warn("BruteForceProtectorService storage path is not set, skipping save operation");
+        } catch (JacksonException ex) {
+            LOGGER.warn("BruteForceProtectorService failed to save records to storage", ex);
         }
     }
 }

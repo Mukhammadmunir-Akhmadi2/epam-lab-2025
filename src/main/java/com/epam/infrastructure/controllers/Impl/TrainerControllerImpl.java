@@ -20,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Set;
+
 @RestController
 @RequiredArgsConstructor
 public class TrainerControllerImpl implements TrainerController {
@@ -35,11 +37,10 @@ public class TrainerControllerImpl implements TrainerController {
     public ResponseEntity<AuthDto> register(TrainerRegistrationRequest trainer) {
 
         Role trainerRole = roleService.getRole(RoleEnum.TRAINER);
-
         TrainingType specialization = trainingTypeService.getTrainingType(trainer.getSpecialization());
 
         Trainer newTrainer = trainerMapper.toModel(trainer, specialization);
-        newTrainer.getRoles().add(trainerRole);
+        newTrainer.setRoles(Set.of(trainerRole));
 
         Trainer saved = trainerService.createTrainer(newTrainer);
         AuthDto authDto = trainerMapper.toAuthDto(saved);

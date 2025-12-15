@@ -8,10 +8,12 @@ import com.epam.application.services.TrainerService;
 import com.epam.application.services.TrainingTypeService;
 import com.epam.infrastructure.controllers.Impl.TrainerControllerImpl;
 import com.epam.infrastructure.dtos.*;
+import com.epam.infrastructure.enums.RoleEnum;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.mappers.TrainerFullMapper;
 import com.epam.infrastructure.mappers.TrainerMapper;
 import com.epam.infrastructure.security.filters.JwtFilter;
+import com.epam.model.Role;
 import com.epam.model.Trainer;
 import com.epam.model.TrainingType;
 import org.junit.jupiter.api.Test;
@@ -75,6 +77,9 @@ class TrainerControllerTest {
         authDto.setUsername("john.doe");
         authDto.setPassword("pass123");
 
+        Role trainerRole = new Role();
+        trainerRole.setRole(RoleEnum.TRAINER);
+
         when(trainingTypeService.getTrainingType(any(TrainingTypeEnum.class)))
                 .thenReturn(specialization);
 
@@ -84,6 +89,8 @@ class TrainerControllerTest {
         when(trainerService.createTrainer(any())).thenReturn(trainer);
 
         when(trainerMapper.toAuthDto(any())).thenReturn(authDto);
+
+        when(roleService.getRole(any())).thenReturn(trainerRole);
 
         mockMvc.perform(post("/trainers")
                         .contentType(MediaType.APPLICATION_JSON)

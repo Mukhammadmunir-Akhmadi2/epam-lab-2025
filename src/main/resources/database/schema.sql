@@ -29,7 +29,6 @@ CREATE TABLE IF NOT EXISTS trainee_trainer (
     PRIMARY KEY (trainer_id, trainee_id)
     );
 
-
 CREATE TABLE IF NOT EXISTS trainings (
     training_id UUID PRIMARY KEY,
     trainer_id UUID NOT NULL REFERENCES trainers(user_id),
@@ -38,5 +37,16 @@ CREATE TABLE IF NOT EXISTS trainings (
     training_name VARCHAR(255) NOT NULL,
     date TIMESTAMP NOT NULL,
     duration INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS roles (
+    role_id UUID PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS user_roles (
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    role_id UUID NOT NULL REFERENCES roles(role_id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, role_id)
 );
 

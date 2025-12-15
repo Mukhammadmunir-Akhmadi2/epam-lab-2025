@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,7 +45,7 @@ public class TraineeControllerImpl implements TraineeController {
 
         Role traineeRole = roleService.getRole(RoleEnum.TRAINEE);
         Trainee newTrainee = traineeMapper.toModel(trainee);
-        newTrainee.getRoles().add(traineeRole);
+        newTrainee.setRoles(Set.of(traineeRole));
 
         Trainee saved = traineeService.createTrainee(newTrainee);
         AuthDto authDto = traineeMapper.toAuthDto(saved);

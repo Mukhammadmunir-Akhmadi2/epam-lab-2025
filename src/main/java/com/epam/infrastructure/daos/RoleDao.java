@@ -26,7 +26,7 @@ public class RoleDao {
     @Column(name = "role_id", nullable = false)
     private UUID roleId;
 
-    @Column(name = "role", nullable = false, unique = true)
+    @Column(name = "role_name", nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
 }

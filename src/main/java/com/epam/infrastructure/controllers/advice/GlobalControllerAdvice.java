@@ -25,9 +25,7 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleResourceNotFound(ResourceNotFoundException ex) {
-
-        LOGGER.error("Resource not found: {}", ex.getMessage());
-        LOGGER.debug("Stack trace: ", ex);
+        LOGGER.warn("Resource not found: {}", ex.getMessage(), ex);
 
         ProblemDetail problem = ProblemDetailUtil.createProblemDetail(HttpStatus.NOT_FOUND, "Resource Not Found", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
@@ -35,18 +33,15 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler({UsernameNotFoundException.class, BadCredentialsException.class})
     public ResponseEntity<ProblemDetail> handleInvalidCredentials(Exception ex) {
-        LOGGER.warn("Invalid credentials: {}", ex.getMessage());
-        LOGGER.debug("Stack trace: ", ex);
+        LOGGER.warn("Invalid credentials: {}", ex.getMessage(), ex);
 
         ProblemDetail problem = ProblemDetailUtil.createProblemDetail(HttpStatus.BAD_REQUEST, "Invalid Credentials", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
     }
 
     @ExceptionHandler(UnauthorizedAccess.class)
     public ResponseEntity<ProblemDetail> handleUnauthorized(UnauthorizedAccess ex) {
-
-        LOGGER.warn("Unauthorized access: {}", ex.getMessage());
-        LOGGER.debug("Stack trace: ", ex);
+        LOGGER.warn("Unauthorized access: {}", ex.getMessage(), ex);
 
         ProblemDetail problem = ProblemDetailUtil.createProblemDetail(HttpStatus.UNAUTHORIZED, "Unauthorized Access", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
@@ -54,9 +49,7 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ProblemDetail> handleIllegalArgument(IllegalArgumentException ex) {
-
-        LOGGER.warn("Illegal argument: {}", ex.getMessage());
-        LOGGER.debug("Stack trace: ", ex);
+        LOGGER.warn("Illegal argument: {}", ex.getMessage(), ex);
 
         ProblemDetail problem = ProblemDetailUtil.createProblemDetail(HttpStatus.BAD_REQUEST, "Illegal Argument", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
@@ -69,8 +62,7 @@ public class GlobalControllerAdvice {
                 .map(v -> v.getPropertyPath() + ": " + v.getMessage())
                 .collect(Collectors.joining("; "));
 
-        LOGGER.warn("Constraint violation: {}", errors);
-        LOGGER.debug("Stack trace: ", ex);
+        LOGGER.warn("Constraint violation: {}", errors, ex);
 
         ProblemDetail problem = ProblemDetailUtil.createProblemDetail(HttpStatus.BAD_REQUEST, "Constraint Violation", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
@@ -82,8 +74,7 @@ public class GlobalControllerAdvice {
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .collect(Collectors.joining("; "));
 
-        LOGGER.warn("Validation failed: {}", errors);
-        LOGGER.debug("Stack trace: ", ex);
+        LOGGER.warn("Validation failed: {}", errors, ex);
 
         ProblemDetail problem = ProblemDetailUtil.createProblemDetail(HttpStatus.BAD_REQUEST, "Validation Error", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
@@ -91,8 +82,7 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ProblemDetail> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
-        LOGGER.warn("missing request body: {}", ex.getMessage());
-        LOGGER.debug("Stack trace: ", ex);
+        LOGGER.warn("Missing request body or invalid JSON: {}", ex.getMessage(), ex);
 
         ProblemDetail problem = ProblemDetailUtil.createProblemDetail(
                 HttpStatus.BAD_REQUEST,
@@ -121,8 +111,7 @@ public class GlobalControllerAdvice {
             combinedErrors += (combinedErrors.isEmpty() ? "" : "; ") + crossErrors;
         }
 
-        LOGGER.warn("Handler method validation failed: {}", combinedErrors);
-        LOGGER.debug("Stack trace: ", ex);
+        LOGGER.warn("Handler method validation failed: {}", combinedErrors, ex);
 
         ProblemDetail problem = ProblemDetailUtil.createProblemDetail(HttpStatus.BAD_REQUEST, "Validation Error", combinedErrors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
@@ -130,8 +119,7 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleGeneric(Exception ex) {
-        LOGGER.error("Internal server error: {}", ex.getMessage());
-        LOGGER.debug("Stack trace: ", ex);
+        LOGGER.error("Internal server error: {}", ex.getMessage(), ex);
         ProblemDetail problem = ProblemDetailUtil.createProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }

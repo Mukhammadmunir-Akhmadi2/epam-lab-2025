@@ -32,8 +32,7 @@ public interface AuthController {
             ),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Login successful"),
-                    @ApiResponse(responseCode = "401", description = "Invalid password for user"),
-                    @ApiResponse(responseCode = "404", description = "User not found")
+                    @ApiResponse(responseCode = "401", description = "Invalid username or password"),
             }
     )
     ResponseEntity<String> login(@Valid @RequestBody AuthDto loginRequest);

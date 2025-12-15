@@ -25,7 +25,6 @@ class JwtServiceTest {
         ReflectionTestUtils.setField(jwtService, "secretKey", secret);
         ReflectionTestUtils.setField(jwtService, "expirationHours", 2);
 
-        // mock UserDetails
         userDetails = mock(UserDetails.class);
         when(userDetails.getUsername()).thenReturn("testuser");
     }
@@ -37,7 +36,7 @@ class JwtServiceTest {
         assertNotNull(token);
         assertEquals("testuser", jwtService.extractUsername(token));
         assertFalse(jwtService.isTokenExpired(token));
-        assertTrue(jwtService.isTokenValid(token, userDetails));
+        assertTrue(jwtService.isTokenValid(token));
     }
 
     @Test
@@ -50,21 +49,17 @@ class JwtServiceTest {
     }
 
     @Test
-    void isTokenExpired_ShouldReturnTrue_ForExpiredToken() throws InterruptedException {
+    void isTokenExpired_ShouldReturnTrue_ForExpiredToken() {
         ReflectionTestUtils.setField(jwtService, "expirationHours", 0);
         String token = jwtService.generateToken(userDetails);
 
-        Thread.sleep(100);
         assertTrue(jwtService.isTokenExpired(token));
+        assertFalse(jwtService.isTokenValid(token));
     }
 
     @Test
-    void isTokenValid_ShouldReturnFalse_ForDifferentUser() {
-        String token = jwtService.generateToken(userDetails);
-
-        UserDetails otherUser = mock(UserDetails.class);
-        when(otherUser.getUsername()).thenReturn("otheruser");
-
-        assertFalse(jwtService.isTokenValid(token, otherUser));
+    void isTokenValid_ShouldReturnFalse_ForInvalidToken() {
+        String invalidToken = "invalid.token.value";
+        assertFalse(jwtService.isTokenValid(invalidToken));
     }
 }
