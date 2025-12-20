@@ -3,6 +3,7 @@ package com.epam.infrastructure.controllers;
 import com.epam.infrastructure.dtos.TrainingTypeDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ public interface TrainingTypeController {
     @Operation(
             summary = "Get all training types",
             description = "Returns a list of all available training types and their IDs.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "List of training types retrieved successfully"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")

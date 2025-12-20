@@ -1,8 +1,8 @@
 package com.epam.application.services.impl;
 
-import com.epam.application.exceptions.InvalidCredentialException;
 import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.provider.AuthProviderService;
+import com.epam.application.provider.BruteForceProtector;
 import com.epam.application.repository.BaseUserRepository;
 import com.epam.application.services.BaseUserAuthService;
 import com.epam.model.User;
@@ -10,6 +10,11 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -17,11 +22,13 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @RequiredArgsConstructor
 public class BaseUserAuthServiceImpl implements BaseUserAuthService {
-    private static final Logger logger = LoggerFactory.getLogger(BaseUserAuthServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseUserAuthServiceImpl.class);
 
     private final AuthProviderService authProviderService;
-
+    private final BruteForceProtector bruteForceProtector;
+    private final AuthenticationManager authenticationManager;
     private final BaseUserRepository baseUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public boolean toggleActive(String username) {
@@ -29,7 +36,7 @@ public class BaseUserAuthServiceImpl implements BaseUserAuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
 
         user.setActive(!user.isActive());
-        logger.info("User '{}' has been {}", username, user.isActive() ? "activated" : "deactivated");
+        LOGGER.info("User '{}' has been {}", username, user.isActive() ? "activated" : "deactivated");
 
         baseUserRepository.save(user);
         return user.isActive();
@@ -41,24 +48,45 @@ public class BaseUserAuthServiceImpl implements BaseUserAuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("Trainee not found with username: " + username));
 
         if (!user.getPassword().equals(oldPassword)) {
-            throw new InvalidCredentialException("Old password is incorrect");
+            throw new BadCredentialsException("Old password is incorrect");
         }
 
-        user.setPassword(newPassword);
+        user.setPassword(passwordEncoder.encode(newPassword));
         baseUserRepository.save(user);
-        logger.info("Password changed for trainee username={}", username);
+        LOGGER.info("Password changed for trainee username={}", username);
     }
 
     @Override
     public String authenticateUser(String username, String password) {
 
-        User user = baseUserRepository.findByUserName(username)
-                .orElseThrow(() ->  new ResourceNotFoundException("User not found username=" + username));
+        if (bruteForceProtector.isBlocked(username)) {
+            long minutes = bruteForceProtector.getRemainingBlockMinutes(username);
+            throw new BadCredentialsException(
+                    "User is blocked. Try again in " + (minutes + 1) + " minutes"
+            );        }
 
-        if (!user.getPassword().equals(password)) {
-            throw new InvalidCredentialException("Invalid password for user " + username);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+
+            bruteForceProtector.resetAttempts(username);
+
+            User user = (User) authentication.getPrincipal();
+            LOGGER.info("User '{}' authenticated successfully", username);
+            return authProviderService.generateTokenForUser(user);
+
+        } catch (BadCredentialsException ex) {
+            bruteForceProtector.recordFailedAttempt(username);
+            LOGGER.warn("Authentication failed for user '{}': {}", username, ex.getMessage());
+
+            if (bruteForceProtector.isBlocked(username)) {
+                long minutes = bruteForceProtector.getRemainingBlockMinutes(username);
+                throw new BadCredentialsException(
+                        "Too many failed attempts. You are blocked for " + minutes + " minute" + (minutes > 1 ? "s" : "")
+                );
+            }
+            throw new BadCredentialsException("Invalid username or password");
         }
-        logger.info("User '{}' authenticated successfully", username);
-        return authProviderService.setAuthenticatedUser(user);
     }
 }

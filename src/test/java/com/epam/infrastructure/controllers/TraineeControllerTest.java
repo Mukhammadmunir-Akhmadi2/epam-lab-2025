@@ -3,20 +3,26 @@ package com.epam.infrastructure.controllers;
 import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.exceptions.UnauthorizedAccess;
 import com.epam.application.provider.AuthProviderService;
+import com.epam.application.services.RoleService;
 import com.epam.application.services.TraineeService;
 import com.epam.application.services.TrainerQueryService;
 import com.epam.application.services.TrainerService;
 import com.epam.infrastructure.controllers.Impl.TraineeControllerImpl;
 import com.epam.infrastructure.dtos.*;
+import com.epam.infrastructure.enums.RoleEnum;
 import com.epam.infrastructure.mappers.TraineeFullMapper;
 import com.epam.infrastructure.mappers.TraineeMapper;
 import com.epam.infrastructure.mappers.TrainerMapper;
+import com.epam.infrastructure.security.filters.JwtFilter;
+import com.epam.model.Role;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TraineeControllerImpl.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TraineeControllerTest {
 
     @Autowired
@@ -45,6 +52,9 @@ class TraineeControllerTest {
     private TrainerQueryService trainerQueryService;
 
     @MockitoBean
+    private RoleService roleService;
+
+    @MockitoBean
     private AuthProviderService authProvider;
 
     @MockitoBean
@@ -56,6 +66,12 @@ class TraineeControllerTest {
     @MockitoBean
     private TrainerMapper trainerMapper;
 
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JwtFilter jwtFilter;
+
     @Test
     void register_ShouldReturnCreated() throws Exception {
         TraineeRegistrationRequest request = new TraineeRegistrationRequest();
@@ -66,9 +82,13 @@ class TraineeControllerTest {
         authDto.setUsername("john.doe");
         authDto.setPassword("pass123");
 
+        Role traineeRole = new Role();
+        traineeRole.setRole(RoleEnum.TRAINEE);
+
         when(traineeMapper.toModel(request)).thenReturn(new Trainee());
         when(traineeService.createTrainee(any())).thenReturn(new Trainee());
         when(traineeMapper.toAuthDto(any())).thenReturn(authDto);
+        when(roleService.getRole(any())).thenReturn(traineeRole);
 
         mockMvc.perform(post("/trainees")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,7 +113,7 @@ class TraineeControllerTest {
         responseDto.setFirstName("John");
         responseDto.setLastName("Doe");
 
-        doNothing().when(authProvider).ensureAuthenticated("john.doe");
+        doNothing().when(authProvider).validateCurrentUser("john.doe");
         when(traineeMapper.toModel(traineeDto)).thenReturn(traineeModel);
         when(traineeService.updateTrainee(traineeModel)).thenReturn(updatedTrainee);
         when(traineeFullMapper.toTraineeResponseDto(updatedTrainee)).thenReturn(responseDto);
@@ -106,7 +126,7 @@ class TraineeControllerTest {
                 .andExpect(jsonPath("$.firstName").value("John"))
                 .andExpect(jsonPath("$.lastName").value("Doe"));
 
-        verify(authProvider, times(1)).ensureAuthenticated("john.doe");
+        verify(authProvider, times(1)).validateCurrentUser("john.doe");
         verify(traineeMapper, times(1)).toModel(traineeDto);
         verify(traineeService, times(1)).updateTrainee(traineeModel);
         verify(traineeFullMapper, times(1)).toTraineeResponseDto(updatedTrainee);
@@ -120,7 +140,7 @@ class TraineeControllerTest {
         TraineeResponseDto responseDto = new TraineeResponseDto();
         responseDto.setUsername(username);
 
-        doNothing().when(authProvider).ensureAuthenticated(username);
+        doNothing().when(authProvider).validateCurrentUser(username);
         when(traineeService.getTraineeByUserName(username)).thenReturn(trainee);
         when(traineeFullMapper.toTraineeResponseDto(trainee)).thenReturn(responseDto);
 
@@ -132,7 +152,7 @@ class TraineeControllerTest {
     @Test
     void deleteProfile_ShouldReturnNoContent() throws Exception {
         String username = "john.doe";
-        doNothing().when(authProvider).ensureAuthenticated(username);
+        doNothing().when(authProvider).validateCurrentUser(username);
         doNothing().when(traineeService).deleteTrainee(username);
 
         mockMvc.perform(delete("/trainees/" + username))
@@ -144,7 +164,7 @@ class TraineeControllerTest {
         String username = "john.doe";
         List<String> trainers = List.of("trainer1", "trainer2");
 
-        doNothing().when(authProvider).ensureAuthenticated(username);
+        doNothing().when(authProvider).validateCurrentUser(username);
         Trainer t1 = new Trainer();
         Trainer t2 = new Trainer();
         when(trainerService.getTrainerByUserName("trainer1")).thenReturn(t1);
@@ -163,7 +183,7 @@ class TraineeControllerTest {
     @Test
     void getUnassignedActiveTrainers_ShouldReturnOk() throws Exception {
         String username = "john.doe";
-        doNothing().when(authProvider).ensureAuthenticated(username);
+        doNothing().when(authProvider).validateCurrentUser(username);
 
         Trainer t1 = new Trainer();
         Trainer t2 = new Trainer();
@@ -179,7 +199,7 @@ class TraineeControllerTest {
     @Test
     void getProfile_Unauthorized_ShouldReturnUnauthorized() throws Exception {
         String username = "john.doe";
-        doThrow(new UnauthorizedAccess("Not allowed")).when(authProvider).ensureAuthenticated(username);
+        doThrow(new UnauthorizedAccess("Not allowed")).when(authProvider).validateCurrentUser(username);
 
         mockMvc.perform(get("/trainees/" + username))
                 .andExpect(status().isUnauthorized())
@@ -190,7 +210,7 @@ class TraineeControllerTest {
     @Test
     void getProfile_NotFound_ShouldReturnNotFound() throws Exception {
         String username = "unknown";
-        doNothing().when(authProvider).ensureAuthenticated(username);
+        doNothing().when(authProvider).validateCurrentUser(username);
         when(traineeService.getTraineeByUserName(username)).thenThrow(new ResourceNotFoundException("Trainee not found"));
 
         mockMvc.perform(get("/trainees/" + username))
@@ -202,7 +222,7 @@ class TraineeControllerTest {
     @Test
     void getUnassignedActiveTrainers_Unauthorized_ShouldReturnUnauthorized() throws Exception {
         String username = "john.doe";
-        doThrow(new UnauthorizedAccess("Not allowed")).when(authProvider).ensureAuthenticated(username);
+        doThrow(new UnauthorizedAccess("Not allowed")).when(authProvider).validateCurrentUser(username);
 
         mockMvc.perform(get("/trainees/{username}/unassigned-trainers", username))
                 .andExpect(status().isUnauthorized())
@@ -214,7 +234,7 @@ class TraineeControllerTest {
     @Test
     void updateTraineeTrainersList_EmptyList_ShouldReturnBadRequest() throws Exception {
         String username = "john.doe";
-        doNothing().when(authProvider).ensureAuthenticated(username);
+        doNothing().when(authProvider).validateCurrentUser(username);
 
         mockMvc.perform(put("/trainees/" + username + "/trainers")
                         .contentType(MediaType.APPLICATION_JSON)

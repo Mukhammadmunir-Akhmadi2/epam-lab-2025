@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = {CommonMapper.class})
+@Mapper(componentModel = "spring", uses = {CommonMapper.class, RoleMapper.class})
 public interface UserMapper {
 
     @Mapping(source = "userId", target = "userId", qualifiedByName = "uuidToString")

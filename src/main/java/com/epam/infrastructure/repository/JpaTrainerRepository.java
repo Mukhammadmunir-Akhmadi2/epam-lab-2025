@@ -36,7 +36,7 @@ public class JpaTrainerRepository implements TrainerRepository {
         }
         TrainerDao existing = entityManager.find(TrainerDao.class, trainerDao.getUserId());
         trainerMapper.updateFields(trainerDao, existing);
-        return trainerFullMapper.toModel(entityManager.merge(trainerDao));
+        return trainerFullMapper.toModel(entityManager.merge(existing));
     }
 
     @Override

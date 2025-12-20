@@ -5,10 +5,10 @@ import com.epam.model.User;
 
 public interface AuthProviderService {
     boolean isAuthenticated(String username);
-    String setAuthenticatedUser(User user);
+    String generateTokenForUser(User user);
     User getAuthenticatedUser();
     void logout();
-    default void ensureAuthenticated(String username) {
+    default void validateCurrentUser(String username) {
         if (!isAuthenticated(username)) {
             throw new UnauthorizedAccess("User " + username + " is not authenticated.");
         }

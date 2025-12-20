@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class AppConfig {
-    private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppConfig.class);
 
     @Bean
     public FilterRegistrationBean<TransactionIdFilter> txIdFilter(TransactionIdFilter filter) {
@@ -30,12 +30,12 @@ public class AppConfig {
         return args -> {
             for (TrainingTypeEnum typeEnum : TrainingTypeEnum.values()) {
                 trainingTypeRepository.findByType(typeEnum).ifPresentOrElse(
-                        existing -> logger.info("Training type {} already exists. Skipping creation.", typeEnum),
+                        existing -> LOGGER.info("Training type {} already exists. Skipping creation.", typeEnum),
                         () -> {
                             TrainingType trainingType = new TrainingType();
                             trainingType.setTrainingType(typeEnum);
                             trainingTypeRepository.save(trainingType);
-                            logger.info("Saved training type: {}", typeEnum);
+                            LOGGER.info("Saved training type: {}", typeEnum);
                         }
                 );
             }

@@ -17,17 +17,17 @@ public class AuthControllerImpl implements AuthController {
     private final AuthProviderService authProvider;
 
     @Override
-    public ResponseEntity<Void> login(AuthDto loginRequest) {
+    public ResponseEntity<String> login(AuthDto loginRequest) {
 
-        baseUserAuthService.authenticateUser(loginRequest.getUsername(), loginRequest.getPassword());
+        String token = baseUserAuthService.authenticateUser(loginRequest.getUsername(), loginRequest.getPassword());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(token);
     }
 
     @Override
     public ResponseEntity<Void> changePassword(String username, ChangePasswordRequest request) {
 
-        authProvider.ensureAuthenticated(username);
+        authProvider.validateCurrentUser(username);
         baseUserAuthService.changePassword(username, request.getOldPassword(), request.getNewPassword());
 
         return ResponseEntity.ok().build();
@@ -36,7 +36,7 @@ public class AuthControllerImpl implements AuthController {
     @Override
     public ResponseEntity<Void> toggleActive(String username) {
 
-        authProvider.ensureAuthenticated(username);
+        authProvider.validateCurrentUser(username);
         baseUserAuthService.toggleActive(username);
 
         return ResponseEntity.ok().build();

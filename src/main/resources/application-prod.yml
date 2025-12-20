@@ -6,3 +6,4 @@ spring:
 logging:
   level:
     root: error
+    org.springframework.security: error

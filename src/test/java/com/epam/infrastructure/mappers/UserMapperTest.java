@@ -30,7 +30,8 @@ class UserMapperTest {
                 "Doe",
                 "john_doe",
                 "password123",
-                true
+                true,
+                null
         );
 
         User user = userMapper.toModel(userDao);
@@ -53,7 +54,8 @@ class UserMapperTest {
                 "Doe",
                 "jane_doe",
                 "securePass",
-                false
+                false,
+                null
         );
 
         UserDao userDao = userMapper.toDao(user);
@@ -75,7 +77,8 @@ class UserMapperTest {
                 "Doe",
                 "john_doe",
                 "password123",
-                true
+                true,
+                null
         );
 
         UserDao updateDao = new UserDao(
@@ -84,7 +87,8 @@ class UserMapperTest {
                 "UpdatedLastName",
                 "updated_username",
                 "newPassword",
-                false
+                false,
+                null
         );
 
         userMapper.updateFields(updateDao, originalDao);

@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -19,12 +20,13 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @RequiredArgsConstructor
 public class TrainerServiceImpl implements TrainerService {
-    private static final Logger log = LoggerFactory.getLogger(TrainerServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrainerServiceImpl.class);
 
     private final TrainerRepository trainerRepository;
     private final BaseUserRepository baseUserRepository;
     private final UsernameGenerator usernameGenerator;
     private final PasswordGenerator passwordGenerator;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Transactional
@@ -33,14 +35,18 @@ public class TrainerServiceImpl implements TrainerService {
         String username = usernameGenerator.generateUsername(
                 trainer, name -> baseUserRepository.findByUserName(name).isPresent()
         );
-        String password = passwordGenerator.generatePassword(10);
+        String generatedPassword = passwordGenerator.generatePassword(10);
 
         trainer.setUsername(username);
-        trainer.setPassword(password);
+        trainer.setPassword(passwordEncoder.encode(generatedPassword));
         trainer.setActive(true);
 
         Trainer saved = trainerRepository.save(trainer);
-        log.info("Created trainer id={} username={}", saved.getUserId(), saved.getUsername());
+
+        LOGGER.info("Created trainer id={} username={}", saved.getUserId(), saved.getUsername());
+
+        saved.setPassword(generatedPassword);
+
         return saved;
     }
 
@@ -56,7 +62,7 @@ public class TrainerServiceImpl implements TrainerService {
         existing.setActive(trainer.isActive());
 
         Trainer updated = trainerRepository.save(existing);
-        log.info("Updated trainer id={} username={}", updated.getUserId(), updated.getUsername());
+        LOGGER.info("Updated trainer id={} username={}", updated.getUserId(), updated.getUsername());
         return updated;
     }
 

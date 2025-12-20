@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -51,6 +52,7 @@ public interface TraineeController {
     @Operation(
             summary = "Update trainee profile",
             description = "Updates trainee personal information such as name, address, and activity state.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = @Parameter(
                     name = "username",
                     description = "Username of the trainee",
@@ -72,6 +74,7 @@ public interface TraineeController {
     @Operation(
             summary = "Get trainee profile",
             description = "Returns full profile information for a trainee.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = @Parameter(
                     name = "username",
                     description = "Username of the trainee",
@@ -89,6 +92,7 @@ public interface TraineeController {
     @Operation(
             summary = "Delete trainee profile",
             description = "Deletes trainee profile permanently.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = @Parameter(
                     name = "username",
                     description = "Username of trainee to delete",
@@ -106,6 +110,7 @@ public interface TraineeController {
     @Operation(
             summary = "Get Active Trainers Not Assigned to a Trainee",
             description = "Retrieves a list of all active trainers who are not currently assigned to the specified trainee.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = @Parameter(
                     name = "username",
                     description = "The username of the trainee for whom to fetch unassigned active trainers",
@@ -125,6 +130,7 @@ public interface TraineeController {
     @Operation(
             summary = "Update assigned trainer list",
             description = "Replaces trainee's trainer list with a new list of trainer usernames.",
+            security = @SecurityRequirement(name = "BearerAuth"),
             parameters = @Parameter(
                     name = "username",
                     description = "Trainee username",
