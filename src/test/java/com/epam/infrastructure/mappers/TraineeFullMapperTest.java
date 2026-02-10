@@ -44,7 +44,7 @@ class TraineeFullMapperTest {
         dao.setLastName("Doe");
         dao.setUsername("john");
         dao.setPassword("123");
-        dao.setActive(true);
+        dao.setIsActive(true);
         dao.setDateOfBirth(LocalDate.of(2000, 1, 1));
         dao.setTrainers(Set.of(trainerDao));
 

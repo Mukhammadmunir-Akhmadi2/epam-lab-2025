@@ -32,5 +32,7 @@ public class Training {
     private LocalDateTime date;
 
     @NotNull
-    private int duration;
+    private Integer duration;
+
+    private Boolean isActive;
 }

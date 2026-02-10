@@ -5,6 +5,7 @@ import com.epam.infrastructure.security.jwt.JwtService;
 import com.epam.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,7 @@ public class JwtAuthProviderService implements AuthProviderService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", user.getUsername());
         claims.put("fullName", user.getFirstName() + " " + user.getLastName());
+        claims.put("auth", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
         return jwtService.generateToken(user, claims);
     }
 

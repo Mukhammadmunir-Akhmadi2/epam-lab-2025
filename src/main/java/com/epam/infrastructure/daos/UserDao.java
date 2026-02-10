@@ -48,12 +48,12 @@ public class UserDao {
     protected String password;
 
     @Column(name = "is_active", nullable = false)
-    protected boolean isActive;
+    protected Boolean isActive;
 
     @ManyToMany
     @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            joinColumns = @JoinColumn(name = "user_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "role_id", nullable = false)
     )
     protected Set<RoleDao> roles = new HashSet<>();
 }

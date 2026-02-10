@@ -26,12 +26,11 @@ public interface TrainerMapper {
     Trainer toBriefModel(TrainerDao trainerDao);
 
     default Trainer toModel(TrainerDto trainerDto, TrainingType trainingType) {
-        if (trainerDto == null) return null;
         Trainer trainer = new Trainer();
         trainer.setUsername(trainerDto.getUsername());
         trainer.setFirstName(trainerDto.getFirstName());
         trainer.setLastName(trainerDto.getLastName());
-        trainer.setActive(trainerDto.isActive());
+        trainer.setIsActive(trainerDto.isActive());
         trainer.setSpecialization(trainingType);
         return trainer;
     };
@@ -74,7 +73,7 @@ public interface TrainerMapper {
     @Mapping(source = "specialization", target = "specialization", qualifiedByName = "toDao")
     @Mapping(target = "trainees", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "roles", ignore = true)
     TrainerDao toTrainerDao(Trainer trainer);
 
@@ -83,7 +82,6 @@ public interface TrainerMapper {
     @Mapping(source = "specialization", target = "specialization", qualifiedByName = "toModel")
     @Mapping(target = "trainees", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "active", ignore = true)
     @Mapping(target = "roles", ignore = true)
     Trainer toTrainer(TrainerDao dao);
 

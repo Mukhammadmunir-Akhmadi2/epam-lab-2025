@@ -9,4 +9,6 @@ public interface TrainingRepository {
     Training save(Training training);
     Optional<Training> findById(String trainingId);
     List<Training> findAll();
+
+    List<Training> findByTraineeUsername(String username);
 }

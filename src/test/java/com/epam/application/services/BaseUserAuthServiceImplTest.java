@@ -47,23 +47,23 @@ class BaseUserAuthServiceImplTest {
         user = new User();
         user.setUsername("john");
         user.setPassword("oldPass");
-        user.setActive(true);
+        user.setIsActive(true);
     }
 
     @Test
     void toggleActive_shouldToggleUserActiveStatus_WhenUserExists() {
-        when(baseUserRepository.findByUserName("john")).thenReturn(Optional.of(user));
+        when(baseUserRepository.findByUsername("john")).thenReturn(Optional.of(user));
 
         boolean result = baseUserAuthService.toggleActive("john");
 
         assertFalse(result);
-        assertFalse(user.isActive());
+        assertFalse(user.getIsActive());
         verify(baseUserRepository).save(user);
     }
 
     @Test
     void toggleActive_shouldThrowException_WhenUserNotFound() {
-        when(baseUserRepository.findByUserName("unknown")).thenReturn(Optional.empty());
+        when(baseUserRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,
                 () -> baseUserAuthService.toggleActive("unknown"));
@@ -71,7 +71,7 @@ class BaseUserAuthServiceImplTest {
 
     @Test
     void changePassword_shouldChangePassword_WhenOldPasswordMatches() {
-        when(baseUserRepository.findByUserName("john")).thenReturn(Optional.of(user));
+        when(baseUserRepository.findByUsername("john")).thenReturn(Optional.of(user));
         when(passwordEncoder.encode("newPass")).thenReturn("encodedNewPass");
 
         baseUserAuthService.changePassword("john", "oldPass", "newPass");
@@ -82,7 +82,7 @@ class BaseUserAuthServiceImplTest {
 
     @Test
     void changePassword_shouldThrowException_WhenUserNotFound() {
-        when(baseUserRepository.findByUserName("unknown")).thenReturn(Optional.empty());
+        when(baseUserRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,
                 () -> baseUserAuthService.changePassword("unknown", "old", "new"));
@@ -90,7 +90,7 @@ class BaseUserAuthServiceImplTest {
 
     @Test
     void changePassword_shouldThrowException_WhenOldPasswordIncorrect() {
-        when(baseUserRepository.findByUserName("john")).thenReturn(Optional.of(user));
+        when(baseUserRepository.findByUsername("john")).thenReturn(Optional.of(user));
 
         assertThrows(BadCredentialsException.class,
                 () -> baseUserAuthService.changePassword("john", "wrongOld", "newPass"));

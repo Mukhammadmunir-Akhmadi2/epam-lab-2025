@@ -2,6 +2,7 @@ package com.epam.infrastructure.controllers;
 
 import com.epam.infrastructure.dtos.ChangePasswordRequest;
 import com.epam.infrastructure.dtos.AuthDto;
+import com.epam.infrastructure.dtos.TokenDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,7 +36,7 @@ public interface AuthController {
                     @ApiResponse(responseCode = "401", description = "Invalid username or password"),
             }
     )
-    ResponseEntity<String> login(@Valid @RequestBody AuthDto loginRequest);
+    ResponseEntity<TokenDto> login(@Valid @RequestBody AuthDto loginRequest);
 
     @PutMapping("/{username}/password")
     @Operation(

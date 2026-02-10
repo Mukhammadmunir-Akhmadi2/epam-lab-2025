@@ -57,7 +57,7 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("token123"));
+                .andExpect(content().string("{\"accessToken\":\"token123\"}"));
 
         verify(baseUserAuthService).authenticateUser("user", "pass");
     }

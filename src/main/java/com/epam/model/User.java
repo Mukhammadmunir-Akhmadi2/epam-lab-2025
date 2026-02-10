@@ -23,7 +23,7 @@ public class User implements UserDetails {
     protected String lastName;
     protected String username;
     protected String password;
-    protected boolean isActive;
+    protected Boolean isActive;
     protected Set<Role> roles = new HashSet<>();
 
     @Override

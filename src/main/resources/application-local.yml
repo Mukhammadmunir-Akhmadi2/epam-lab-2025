@@ -8,7 +8,17 @@ spring:
     password: 4999
     driver-class-name: org.postgresql.Driver
 
+hibernate:
+  hbm2ddl:
+    auto: update
+  highlight_sql: true
+
 logging:
   level:
     root: info
     org.springframework.security: debug
+
+system:
+  admin:
+    username: admin
+    password: admin

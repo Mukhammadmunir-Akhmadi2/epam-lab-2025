@@ -38,7 +38,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(BaseUserRepository userRepository) {
         return username -> userRepository
-                .findByUserName(username)
+                .findByUsername(username)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Invalid username or password")
                 );
@@ -68,7 +68,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/trainers").permitAll()
                         .requestMatchers(HttpMethod.POST, "/trainees").permitAll()
                         .requestMatchers("/users/login").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers(
+                                "/eureka/**",
+                                "/actuator/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .requestMatchers("/trainees/**", "/trainings/trainee/**").hasAuthority("TRAINEE")
                         .requestMatchers("/trainers/**", "/trainings/trainer/**").hasAuthority("TRAINER")
                         .anyRequest().authenticated())

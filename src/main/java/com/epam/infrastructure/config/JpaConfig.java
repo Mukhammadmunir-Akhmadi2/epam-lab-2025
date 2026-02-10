@@ -28,6 +28,12 @@ public class JpaConfig {
     @Value("${spring.custom-datasource.driver-class-name}")
     private String dbDriver;
 
+    @Value("${hibernate.hbm2ddl.auto}")
+    private String ddl;
+
+    @Value("${hibernate.highlight_sql}")
+    private String highlightSql;
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -66,8 +72,8 @@ public class JpaConfig {
     private Properties jpaProperties() {
         Properties properties = new Properties();
 
-        properties.setProperty("hibernate.hbm2ddl.auto", "create");
-        properties.setProperty("hibernate.highlight_sql", "true");
+        properties.setProperty("hibernate.hbm2ddl.auto", ddl);
+        properties.setProperty("hibernate.highlight_sql", highlightSql);
 
         return properties;
     }

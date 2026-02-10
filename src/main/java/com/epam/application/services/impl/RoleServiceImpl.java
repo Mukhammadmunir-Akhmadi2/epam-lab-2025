@@ -1,5 +1,6 @@
 package com.epam.application.services.impl;
 
+import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.repository.RoleRepository;
 import com.epam.application.services.RoleService;
 import com.epam.infrastructure.enums.RoleEnum;
@@ -16,6 +17,6 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role getRole(RoleEnum role) {
         return roleRepository.findByName(role)
-                .get();
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
     }
 }

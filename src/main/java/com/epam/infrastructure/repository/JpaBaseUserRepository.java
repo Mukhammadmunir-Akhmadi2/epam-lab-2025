@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
-public class JpaBaseBaseUserRepository implements BaseUserRepository {
+public class JpaBaseUserRepository implements BaseUserRepository {
 
     private final UserMapper userMapper;
 
@@ -24,7 +24,7 @@ public class JpaBaseBaseUserRepository implements BaseUserRepository {
     private EntityManager entityManager;
 
     @Override
-    public Optional<User> findByUserName(String username) {
+    public Optional<User> findByUsername(String username) {
         try {
             UserDao userDao = entityManager.createNamedQuery("UserDao.findByUsername", UserDao.class)
                     .setParameter("username", username)
@@ -42,7 +42,8 @@ public class JpaBaseBaseUserRepository implements BaseUserRepository {
         UserDao userDao = userMapper.toDao(user);
 
         if (userDao.getUserId() == null) {
-            throw new IllegalArgumentException("Cannot update user without ID");
+            entityManager.persist(userDao);
+            return userMapper.toModel(userDao);
         }
 
         UserDao existing = entityManager.find(UserDao.class, UUID.fromString(user.getUserId()));

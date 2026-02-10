@@ -8,8 +8,7 @@ import com.epam.application.services.BaseUserAuthService;
 import com.epam.model.User;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,12 +17,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+@Log4j2
 @Service
 @Validated
 @RequiredArgsConstructor
 public class BaseUserAuthServiceImpl implements BaseUserAuthService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseUserAuthServiceImpl.class);
-
     private final AuthProviderService authProviderService;
     private final BruteForceProtector bruteForceProtector;
     private final AuthenticationManager authenticationManager;
@@ -32,19 +30,19 @@ public class BaseUserAuthServiceImpl implements BaseUserAuthService {
 
     @Override
     public boolean toggleActive(String username) {
-        User user = baseUserRepository.findByUserName(username)
+        User user = baseUserRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
 
-        user.setActive(!user.isActive());
-        LOGGER.info("User '{}' has been {}", username, user.isActive() ? "activated" : "deactivated");
+        user.setIsActive(!user.getIsActive());
+        log.info("User '{}' has been {}", username, user.getIsActive() ? "activated" : "deactivated");
 
         baseUserRepository.save(user);
-        return user.isActive();
+        return user.getIsActive();
     }
 
     @Override
     public void changePassword(String username, String oldPassword, @Size(min = 6) String newPassword) {
-        User user = baseUserRepository.findByUserName(username)
+        User user = baseUserRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Trainee not found with username: " + username));
 
         if (!user.getPassword().equals(oldPassword)) {
@@ -53,7 +51,7 @@ public class BaseUserAuthServiceImpl implements BaseUserAuthService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         baseUserRepository.save(user);
-        LOGGER.info("Password changed for trainee username={}", username);
+        log.info("Password changed for trainee username={}", username);
     }
 
     @Override
@@ -73,12 +71,12 @@ public class BaseUserAuthServiceImpl implements BaseUserAuthService {
             bruteForceProtector.resetAttempts(username);
 
             User user = (User) authentication.getPrincipal();
-            LOGGER.info("User '{}' authenticated successfully", username);
+            log.info("User '{}' authenticated successfully", username);
             return authProviderService.generateTokenForUser(user);
 
         } catch (BadCredentialsException ex) {
             bruteForceProtector.recordFailedAttempt(username);
-            LOGGER.warn("Authentication failed for user '{}': {}", username, ex.getMessage());
+            log.warn("Authentication failed for user '{}': {}", username, ex.getMessage());
 
             if (bruteForceProtector.isBlocked(username)) {
                 long minutes = bruteForceProtector.getRemainingBlockMinutes(username);

@@ -5,6 +5,7 @@ import com.epam.application.services.BaseUserAuthService;
 import com.epam.infrastructure.controllers.AuthController;
 import com.epam.infrastructure.dtos.ChangePasswordRequest;
 import com.epam.infrastructure.dtos.AuthDto;
+import com.epam.infrastructure.dtos.TokenDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,9 +18,11 @@ public class AuthControllerImpl implements AuthController {
     private final AuthProviderService authProvider;
 
     @Override
-    public ResponseEntity<String> login(AuthDto loginRequest) {
+    public ResponseEntity<TokenDto> login(AuthDto loginRequest) {
 
-        String token = baseUserAuthService.authenticateUser(loginRequest.getUsername(), loginRequest.getPassword());
+        String accessToken = baseUserAuthService.authenticateUser(loginRequest.getUsername(), loginRequest.getPassword());
+        TokenDto token = new TokenDto();
+        token.setAccessToken(accessToken);
 
         return ResponseEntity.ok().body(token);
     }

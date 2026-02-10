@@ -58,7 +58,7 @@ class JpaTrainerQueryRepositoryTest {
         trainer1.setFirstName("John");
         trainer1.setLastName("Doe");
         trainer1.setPassword("pass123");
-        trainer1.setActive(true);
+        trainer1.setIsActive(true);
         trainer1.setSpecialization(trainingType);
         trainer1 = trainerRepository.save(trainer1);
 
@@ -67,7 +67,7 @@ class JpaTrainerQueryRepositoryTest {
         trainer2.setFirstName("Alice");
         trainer2.setLastName("Smith");
         trainer2.setPassword("abc123");
-        trainer2.setActive(true);
+        trainer2.setIsActive(true);
         trainer2.setSpecialization(trainingType);
         trainer2 = trainerRepository.save(trainer2);
 
@@ -76,7 +76,7 @@ class JpaTrainerQueryRepositoryTest {
         trainee.setFirstName("Bob");
         trainee.setLastName("Brown");
         trainee.setPassword("123abc");
-        trainee.setActive(true);
+        trainee.setIsActive(true);
         trainee = traineeRepository.save(trainee);
     }
 

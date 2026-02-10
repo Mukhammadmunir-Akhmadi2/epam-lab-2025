@@ -8,6 +8,11 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
+hibernate:
+  hbm2ddl:
+    auto: create-drop
+  highlight_sql: false
+
 logging:
   level:
     root: info

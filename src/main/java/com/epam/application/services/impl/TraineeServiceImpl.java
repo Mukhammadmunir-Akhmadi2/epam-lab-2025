@@ -6,13 +6,16 @@ import com.epam.application.generators.UsernameGenerator;
 import com.epam.application.repository.BaseUserRepository;
 import com.epam.application.repository.TraineeRepository;
 import com.epam.application.services.TraineeService;
+import com.epam.application.tx.AfterCommitExecutor;
+import com.epam.application.port.WorkloadEventPublisher;
+import com.epam.infrastructure.repository.JpaTrainingRepository;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
+import com.epam.model.Training;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,33 +25,36 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+@Log4j2
 @Service
 @Validated
 @RequiredArgsConstructor
 public class TraineeServiceImpl implements TraineeService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TraineeServiceImpl.class);
-
     private final TraineeRepository traineeRepository;
     private final BaseUserRepository baseUserRepository;
+    private final JpaTrainingRepository trainingRepository;
+
     private final UsernameGenerator usernameGenerator;
     private final PasswordGenerator passwordGenerator;
     private final PasswordEncoder passwordEncoder;
 
+    private final AfterCommitExecutor afterCommitExecutor;
+    private final WorkloadEventPublisher workloadPublisher;
 
     @Transactional
     @Override
     public Trainee createTrainee(@Valid Trainee trainee) {
         String username = usernameGenerator
-                .generateUsername(trainee, name -> baseUserRepository.findByUserName(name).isPresent());
+                .generateUsername(trainee, name -> baseUserRepository.findByUsername(name).isPresent());
         String generatedPassword = passwordGenerator.generatePassword(10);
 
         trainee.setUsername(username);
         trainee.setPassword(passwordEncoder.encode(generatedPassword));
-        trainee.setActive(true);
+        trainee.setIsActive(true);
 
         Trainee saved = traineeRepository.save(trainee);
 
-        LOGGER.info("Created trainee id={} username={}", saved.getUserId(), saved.getUsername());
+        log.info("Created trainee id={} username={}", saved.getUserId(), saved.getUsername());
 
         saved.setPassword(generatedPassword);
 
@@ -66,19 +72,29 @@ public class TraineeServiceImpl implements TraineeService {
 
         existing.setDateOfBirth(trainee.getDateOfBirth());
         existing.setAddress(trainee.getAddress());
-        existing.setActive(trainee.isActive());
+        existing.setIsActive(trainee.getIsActive());
 
         Trainee updated = traineeRepository.save(existing);
 
-        LOGGER.info("Updated trainee id={} username={}", updated.getUserId(), updated.getUsername());
+        log.info("Updated trainee id={} username={}", updated.getUserId(), updated.getUsername());
         return updated;
     }
 
-    @Transactional
     @Override
-    public void deleteTrainee(String traineeId) {
-        traineeRepository.delete(traineeId);
-        LOGGER.info("Permanently deleted trainee id={}", traineeId);
+    @Transactional
+    public void deleteTrainee(String username) {
+
+        Trainee trainee = traineeRepository.findByUserName(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Trainee", username));
+
+        List<Training> trainings = trainingRepository.findByTraineeUsername(username);
+
+        traineeRepository.delete(trainee.getUserId());
+
+        afterCommitExecutor.run(() -> workloadPublisher.publishTrainingsDeleted(trainings));
+
+        log.info("Permanently deleted trainee id={} username={} cascadedTrainings={}",
+                username, username, trainings.size());
     }
 
     @Override
@@ -104,7 +120,7 @@ public class TraineeServiceImpl implements TraineeService {
 
         trainee.setTrainers(new HashSet<>(trainers));
         Trainee saved = traineeRepository.save(trainee);
-        LOGGER.info("Updated trainers for trainee username={} trainerCount={}", traineeUsername, trainers.size());
+        log.info("Updated trainers for trainee username={} trainerCount={}", traineeUsername, trainers.size());
 
         return new ArrayList<>(saved.getTrainers());
     }

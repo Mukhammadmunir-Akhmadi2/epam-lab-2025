@@ -57,4 +57,20 @@ public class JpaTrainingRepository implements TrainingRepository {
                 .getResultList();
         return trainingMapper.toModelList(daos);
     }
+
+    @Override
+    public List<Training> findByTraineeUsername(String username) {
+        return entityManager.createQuery("""
+            SELECT t
+            FROM TrainingDao t
+            JOIN FETCH t.trainer tr
+            JOIN FETCH t.trainee te
+            WHERE te.username = :username
+        """, TrainingDao.class)
+                .setParameter("username", username)
+                .getResultList()
+                .stream()
+                .map(trainingMapper::toFullModel)
+                .toList();
+    }
 }
