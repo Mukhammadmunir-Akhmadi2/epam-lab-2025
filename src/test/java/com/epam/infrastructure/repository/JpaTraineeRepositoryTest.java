@@ -45,7 +45,7 @@ class JpaTraineeRepositoryTest {
         trainee.setFirstName("John");
         trainee.setLastName("Doe");
         trainee.setPassword("secret123");
-        trainee.setActive(true);
+        trainee.setIsActive(true);
     }
 
     @AfterEach
@@ -90,7 +90,7 @@ class JpaTraineeRepositoryTest {
         another.setFirstName("Jane");
         another.setLastName("Doe");
         another.setPassword("pass1234");
-        another.setActive(true);
+        another.setIsActive(true);
         traineeRepository.save(another);
 
         List<Trainee> all = traineeRepository.findAll();
@@ -139,7 +139,7 @@ class JpaTraineeRepositoryTest {
         duplicate.setFirstName("John2");
         duplicate.setLastName("Doe2");
         duplicate.setPassword("secret456");
-        duplicate.setActive(true);
+        duplicate.setIsActive(true);
 
         assertThrows(DataIntegrityViolationException.class, () -> traineeRepository.save(duplicate));
     }

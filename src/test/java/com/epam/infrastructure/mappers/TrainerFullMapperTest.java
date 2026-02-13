@@ -42,7 +42,7 @@ class TrainerFullMapperTest {
         dao.setFirstName("Mike");
         dao.setLastName("Connor");
         dao.setUsername("mike");
-        dao.setActive(true);
+        dao.setIsActive(true);
         dao.setSpecialization(typeDao);
         dao.setTrainees(Set.of(traineeDao));
 

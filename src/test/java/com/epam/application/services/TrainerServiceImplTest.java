@@ -69,7 +69,7 @@ class TrainerServiceImplTest {
         assertNotNull(created.getUsername());
         assertEquals("alice.smith", created.getUsername());
         assertEquals("secret123", created.getPassword()); // raw password returned
-        assertTrue(created.isActive());
+        assertTrue(created.getIsActive());
 
         verify(trainerRepository, times(1)).save(any());
         verify(usernameGenerator, times(1)).generateUsername(any(), any());
@@ -111,7 +111,7 @@ class TrainerServiceImplTest {
         updatedInfo.setFirstName("AliceUpdated");
         updatedInfo.setLastName("SmithUpdated");
         updatedInfo.setSpecialization(trainer.getSpecialization());
-        updatedInfo.setActive(trainer.isActive());
+        updatedInfo.setIsActive(trainer.getIsActive());
 
         when(trainerRepository.findByUserName(trainer.getUsername())).thenReturn(Optional.of(trainer));
         when(trainerRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));

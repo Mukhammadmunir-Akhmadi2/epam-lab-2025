@@ -3,11 +3,12 @@ package com.epam.application.services.impl;
 import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.repository.TrainingRepository;
 import com.epam.application.services.TrainingService;
+import com.epam.application.tx.AfterCommitExecutor;
+import com.epam.application.port.WorkloadEventPublisher;
 import com.epam.model.Training;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -15,19 +16,27 @@ import org.springframework.validation.annotation.Validated;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
 @Service
 @Validated
 @RequiredArgsConstructor
 public class TrainingServiceImpl implements TrainingService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
     private final TrainingRepository trainingRepository;
+    private final AfterCommitExecutor afterCommitExecutor;
+    private final WorkloadEventPublisher workloadPublisher;
 
     @Transactional
     @Override
     public Training createTraining(@Valid Training training) {
+        training.setIsActive(true);
         Training saved = trainingRepository.save(training);
-        LOGGER.info("Created training id={} name={}", saved.getTrainingId(), saved.getTrainingName());
+
+        Training db = trainingRepository.findById(saved.getTrainingId()).get();
+
+        afterCommitExecutor.run(() -> workloadPublisher.publishTrainingAdded(db));
+
+        log.info("Created training id={} name={}", saved.getTrainingId(), saved.getTrainingName());
         return saved;
     }
 

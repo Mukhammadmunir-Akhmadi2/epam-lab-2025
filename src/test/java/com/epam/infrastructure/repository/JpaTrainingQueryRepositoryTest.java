@@ -63,7 +63,7 @@ class JpaTrainingQueryRepositoryTest {
         trainer.setFirstName("John");
         trainer.setLastName("Doe");
         trainer.setPassword("pass123");
-        trainer.setActive(true);
+        trainer.setIsActive(true);
         trainer.setSpecialization(trainingType);
         trainer = trainerRepository.save(trainer);
 
@@ -72,7 +72,7 @@ class JpaTrainingQueryRepositoryTest {
         trainee.setFirstName("Alice");
         trainee.setLastName("Smith");
         trainee.setPassword("abc123");
-        trainee.setActive(true);
+        trainee.setIsActive(true);
         trainee = traineeRepository.save(trainee);
 
         training1 = new Training();
@@ -82,6 +82,7 @@ class JpaTrainingQueryRepositoryTest {
         training1.setTrainingType(trainingType);
         training1.setDate(LocalDateTime.now().plusDays(1));
         training1.setDuration(60);
+        training1.setIsActive(true);
         trainingRepository.save(training1);
 
         training2 = new Training();
@@ -91,6 +92,7 @@ class JpaTrainingQueryRepositoryTest {
         training2.setTrainingType(trainingType);
         training2.setDate(LocalDateTime.now().plusDays(2));
         training2.setDuration(45);
+        training2.setIsActive(true);
         trainingRepository.save(training2);
     }
 

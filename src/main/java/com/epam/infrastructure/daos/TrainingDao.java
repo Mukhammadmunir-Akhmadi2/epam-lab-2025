@@ -26,11 +26,11 @@ import java.util.UUID;
 @NamedQueries({
         @NamedQuery(
                 name = "TrainingDao.findAllTrainings",
-                query = "SELECT t FROM TrainingDao t JOIN FETCH t.trainingType"
+                query = "SELECT t FROM TrainingDao t JOIN FETCH t.trainingType WHERE t.isActive = TRUE"
         ),
         @NamedQuery(
                 name = "TrainingDao.findByIdDetailed",
-                query = "SELECT t FROM TrainingDao t JOIN FETCH t.trainer JOIN FETCH t.trainingType JOIN FETCH t.trainee WHERE t.trainingId = :trainingId"
+                query = "SELECT t FROM TrainingDao t JOIN FETCH t.trainer JOIN FETCH t.trainingType JOIN FETCH t.trainee WHERE t.trainingId = :trainingId AND t.isActive = TRUE"
         )
 })
 public class TrainingDao {
@@ -59,5 +59,8 @@ public class TrainingDao {
     private LocalDateTime date;
 
     @Column(nullable = false)
-    private int duration;
+    private Integer duration;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
 }

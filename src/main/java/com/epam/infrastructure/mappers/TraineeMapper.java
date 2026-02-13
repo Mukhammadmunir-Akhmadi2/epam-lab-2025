@@ -31,7 +31,7 @@ public interface TraineeMapper {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "trainers", ignore = true)
     @Mapping(target = "username", ignore = true)
-    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
     Trainee toModel(TraineeRegistrationRequest request);
 
     @Mapping(target = "userId", ignore = true)
@@ -69,7 +69,7 @@ public interface TraineeMapper {
     @Mapping(target = "trainings", ignore = true)
     @Mapping(target = "trainers", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "roles", ignore = true)
     TraineeDao toTraineeDao(Trainee trainee);
 
@@ -79,7 +79,7 @@ public interface TraineeMapper {
     @Mapping(target = "dateOfBirth", ignore = true)
     @Mapping(target = "trainers", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "roles", ignore = true)
     Trainee toTrainee(TraineeDao dao);
 

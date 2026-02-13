@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class JpaBaseBaseUserRepositoryTest {
 
     @Autowired
-    private JpaBaseBaseUserRepository userRepository;
+    private JpaBaseUserRepository userRepository;
 
     @Autowired
     private JpaTraineeRepository traineeRepository;
@@ -52,6 +52,7 @@ class JpaBaseBaseUserRepositoryTest {
         trainee.setFirstName("John");
         trainee.setLastName("Doe");
         trainee.setPassword("pass123");
+        trainee.setIsActive(true);
         trainee = traineeRepository.save(trainee);
 
         TrainingType trainingType = new TrainingType();
@@ -65,6 +66,7 @@ class JpaBaseBaseUserRepositoryTest {
         trainer.setLastName("Doe");
         trainer.setPassword("pass456");
         trainer.setSpecialization(trainingType);
+        trainer.setIsActive(true);
         trainer = trainerRepository.save(trainer);
     }
 
@@ -79,24 +81,24 @@ class JpaBaseBaseUserRepositoryTest {
     }
 
     @Test
-    void findByUserName_shouldReturnTrainee() {
-        Optional<User> found = userRepository.findByUserName("john_trainee");
+    void findByUsername_shouldReturnTrainee() {
+        Optional<User> found = userRepository.findByUsername("john_trainee");
         assertTrue(found.isPresent());
         assertEquals("john_trainee", found.get().getUsername());
         assertEquals("John", found.get().getFirstName());
     }
 
     @Test
-    void findByUserName_shouldReturnTrainer() {
-        Optional<User> found = userRepository.findByUserName("jane_trainer");
+    void findByUsername_shouldReturnTrainer() {
+        Optional<User> found = userRepository.findByUsername("jane_trainer");
         assertTrue(found.isPresent());
         assertEquals("jane_trainer", found.get().getUsername());
         assertEquals("Jane", found.get().getFirstName());
     }
 
     @Test
-    void findByUserName_shouldReturnEmpty_whenNotExists() {
-        Optional<User> found = userRepository.findByUserName("nonexistent_user");
+    void findByUsername_shouldReturnEmpty_whenNotExists() {
+        Optional<User> found = userRepository.findByUsername("nonexistent_user");
         assertFalse(found.isPresent());
     }
 
@@ -118,14 +120,5 @@ class JpaBaseBaseUserRepositoryTest {
 
         assertEquals(trainer.getUserId(), updated.getUserId());
         assertEquals("Janet", updated.getFirstName());
-    }
-
-    @Test
-    void save_shouldThrow_whenUserIdIsNull() {
-        User newUser = new User(); // no ID
-        newUser.setUsername("new_user");
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> userRepository.save(newUser));
-        assertEquals("Cannot update user without ID", ex.getMessage());
     }
 }

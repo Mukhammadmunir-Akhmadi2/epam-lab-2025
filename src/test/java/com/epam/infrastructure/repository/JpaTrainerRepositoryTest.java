@@ -52,7 +52,7 @@ class JpaTrainerRepositoryTest {
         trainer.setFirstName("John");
         trainer.setLastName("Doe");
         trainer.setPassword("pass123");
-        trainer.setActive(true);
+        trainer.setIsActive(true);
         trainer.setSpecialization(specialization);
     }
 
@@ -98,7 +98,7 @@ class JpaTrainerRepositoryTest {
         another.setFirstName("Alice");
         another.setLastName("Smith");
         another.setPassword("abc123");
-        another.setActive(true);
+        another.setIsActive(true);
         another.setSpecialization(trainer.getSpecialization());
         trainerRepository.save(another);
 
@@ -139,7 +139,7 @@ class JpaTrainerRepositoryTest {
         duplicate.setFirstName("John2");
         duplicate.setLastName("Doe2");
         duplicate.setPassword("pass456");
-        duplicate.setActive(true);
+        duplicate.setIsActive(true);
         duplicate.setSpecialization(saved.getSpecialization());
 
         assertThrows(DataIntegrityViolationException.class,

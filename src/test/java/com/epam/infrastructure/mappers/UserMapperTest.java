@@ -42,7 +42,7 @@ class UserMapperTest {
         assertEquals("Doe", user.getLastName());
         assertEquals("john_doe", user.getUsername());
         assertEquals("password123", user.getPassword());
-        assertTrue(user.isActive());
+        assertTrue(user.getIsActive());
     }
 
     @Test
@@ -66,7 +66,7 @@ class UserMapperTest {
         assertEquals("Doe", userDao.getLastName());
         assertEquals("jane_doe", userDao.getUsername());
         assertEquals("securePass", userDao.getPassword());
-        assertFalse(userDao.isActive());
+        assertFalse(userDao.getIsActive());
     }
 
     @Test
@@ -99,6 +99,6 @@ class UserMapperTest {
         assertEquals("UpdatedFirstName", originalDao.getFirstName());
         assertEquals("UpdatedLastName", originalDao.getLastName());
         assertEquals("newPassword", originalDao.getPassword());
-        assertFalse(originalDao.isActive());
+        assertFalse(originalDao.getIsActive());
     }
 }

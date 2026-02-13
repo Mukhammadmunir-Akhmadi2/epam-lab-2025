@@ -56,7 +56,7 @@ class TrainerMapperTest {
         assertEquals("trainer123", trainer.getUsername());
         assertEquals("Jane", trainer.getFirstName());
         assertEquals("Smith", trainer.getLastName());
-        assertTrue(trainer.isActive());
+        assertTrue(trainer.getIsActive());
         assertEquals(TrainingTypeEnum.CARDIO, trainer.getSpecialization().getTrainingType());
     }
 

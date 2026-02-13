@@ -3,9 +3,12 @@ package com.epam.application.services;
 import com.epam.application.exceptions.ResourceNotFoundException;
 import com.epam.application.generators.PasswordGenerator;
 import com.epam.application.generators.UsernameGenerator;
+import com.epam.application.port.WorkloadEventPublisher;
 import com.epam.application.repository.BaseUserRepository;
 import com.epam.application.repository.TraineeRepository;
 import com.epam.application.services.impl.TraineeServiceImpl;
+import com.epam.application.tx.AfterCommitExecutor;
+import com.epam.infrastructure.repository.JpaTrainingRepository;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +48,14 @@ class TraineeServiceImplTest {
 
     private Trainee defaultTrainee;
 
+    @Mock
+    private AfterCommitExecutor afterCommitExecutor;
+    @Mock
+    private WorkloadEventPublisher workloadPublisher;
+    @Mock
+    private JpaTrainingRepository trainingRepository;
+
+
     @BeforeEach
     void setUp() {
         defaultTrainee = new Trainee();
@@ -54,7 +65,7 @@ class TraineeServiceImplTest {
         defaultTrainee.setDateOfBirth(LocalDate.of(2000, 1, 1));
         defaultTrainee.setAddress("123 Main St");
         defaultTrainee.setUsername("Alice.Smith");
-        defaultTrainee.setActive(true);
+        defaultTrainee.setIsActive(true);
     }
 
     @Test
@@ -69,7 +80,7 @@ class TraineeServiceImplTest {
         assertNotNull(created.getUsername());
         assertEquals("john.doe", created.getUsername());
         assertEquals("secret123", created.getPassword()); // raw password returned
-        assertTrue(created.isActive());
+        assertTrue(created.getIsActive());
 
         verify(traineeRepository, times(1)).save(any());
         verify(usernameGenerator, times(1)).generateUsername(any(), any());
@@ -78,12 +89,43 @@ class TraineeServiceImplTest {
     }
 
     @Test
-    void testTraineePermanentDelete() {
-        traineeService.deleteTrainee(defaultTrainee.getUserId());
+    void testTraineePermanentDelete_deletesAndPublishesAfterCommit() {
+        when(traineeRepository.findByUserName("Alice.Smith"))
+                .thenReturn(Optional.of(defaultTrainee));
 
-        verify(traineeRepository, never()).save(any());
-        verify(traineeRepository, times(1)).delete(defaultTrainee.getUserId());
+        when(trainingRepository.findByTraineeUsername("Alice.Smith"))
+                .thenReturn(List.of()); // or trainings
+
+        doAnswer(inv -> {
+            inv.<Runnable>getArgument(0).run(); // run immediately
+            return null;
+        }).when(afterCommitExecutor).run(any(Runnable.class));
+
+        traineeService.deleteTrainee("Alice.Smith");
+
+        verify(traineeRepository).findByUserName("Alice.Smith");
+        verify(trainingRepository).findByTraineeUsername("Alice.Smith");
+        verify(traineeRepository).delete(defaultTrainee.getUserId());
+
+        verify(afterCommitExecutor).run(any(Runnable.class));
+        verify(workloadPublisher).publishTrainingsDeleted(anyList());
     }
+
+
+    @Test
+    void testTraineePermanentDelete_notFound_throws() {
+        when(traineeRepository.findByUserName("Alice.Smith"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> traineeService.deleteTrainee("Alice.Smith"));
+
+        verify(traineeRepository, never()).delete(anyString());
+        verify(trainingRepository, never()).findByTraineeUsername(anyString());
+        verify(afterCommitExecutor, never()).run(any());
+        verify(workloadPublisher, never()).publishTrainingsDeleted(anyList());
+    }
+
 
     @Test
     void testGetTraineeByIdNotFound() {

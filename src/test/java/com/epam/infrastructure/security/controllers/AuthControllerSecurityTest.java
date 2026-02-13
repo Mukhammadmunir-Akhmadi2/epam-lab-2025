@@ -62,7 +62,7 @@ class AuthControllerSecurityTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("valid-token"));
+                .andExpect(content().string("{\"accessToken\":\"valid-token\"}"));
     }
 
     @Test
