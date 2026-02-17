@@ -3,6 +3,7 @@ package com.epam.infrastructure.outbox;
 import com.epam.infrastructure.dtos.TrainerWorkloadRequestDto;
 import com.epam.infrastructure.enums.OutboxEventType;
 import com.epam.infrastructure.enums.OutboxStatus;
+import com.epam.infrastructure.logging.TransactionIdFilter;
 import com.epam.infrastructure.outbox.entity.WorkloadOutboxEvent;
 import com.epam.infrastructure.outbox.util.OutboxSerializer;
 import com.epam.infrastructure.repository.JpaWorkloadOutboxRepository;
@@ -30,7 +31,7 @@ public class WorkloadOutboxService implements WorkloadOutboxPort {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void enqueue(TrainerWorkloadRequestDto req, String aggregateId, String error) {
         LocalDateTime now = LocalDateTime.now();
-        String txId = MDC.get("transactionId");
+        String txId = MDC.get(TransactionIdFilter.TRANSACTION_ID_HEADER);
         if (txId == null || txId.isBlank()) txId = "no-tx";
 
         WorkloadOutboxEvent event = new WorkloadOutboxEvent();
@@ -47,8 +48,8 @@ public class WorkloadOutboxService implements WorkloadOutboxPort {
         event = repo.save(event);
 
         log.info(
-                "Outbox event enqueued. eventId{}, eventType={}, aggregateId={}, txId={}",
-                event.getWoeId(), event.getEventType(), aggregateId, txId
+                "Outbox event enqueued. eventId{}, eventType={}, aggregateId={}",
+                event.getWoeId(), event.getEventType(), aggregateId
         );
     }
 
