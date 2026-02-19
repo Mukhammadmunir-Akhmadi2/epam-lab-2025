@@ -18,6 +18,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -64,7 +65,7 @@ class JpaWorkloadOutboxRepositoryTest {
         e.setAggregateId(UUID.randomUUID().toString());
         e.setTransactionId(UUID.randomUUID().toString());
         e.setEventType(OutboxEventType.TRAINING_WORKLOAD);
-        e.setPayloadJson("{\"trainer\":\"john\",\"duration\":45}");
+        e.setPayload(Map.of("trainer", "john", "duration", 45));
 
         e.setLastError("");
 

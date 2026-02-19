@@ -18,7 +18,7 @@ public class KafkaHeadersProvider {
         return MDC.get(TransactionIdFilter.TRANSACTION_ID_HEADER);
     }
 
-    public String currentAuthorizationValue() {
+    public String innerServerAuthorizationValue() {
         return "Bearer " + tokenService.issueServiceToken();
     }
 }

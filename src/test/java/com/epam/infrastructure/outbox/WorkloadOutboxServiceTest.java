@@ -13,6 +13,7 @@ import org.slf4j.MDC;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -46,7 +47,7 @@ class WorkloadOutboxServiceTest {
         // FIX: use same key as production code
         MDC.put(TransactionIdFilter.TRANSACTION_ID_HEADER, txId);
 
-        when(serializer.toJson(req)).thenReturn("{\"ok\":true}");
+        when(serializer.toMap(req)).thenReturn(Map.of("ok", true));
 
         when(repo.save(any(WorkloadOutboxEvent.class))).thenAnswer(inv -> {
             WorkloadOutboxEvent e = inv.getArgument(0);
@@ -58,7 +59,7 @@ class WorkloadOutboxServiceTest {
 
         ArgumentCaptor<WorkloadOutboxEvent> captor = ArgumentCaptor.forClass(WorkloadOutboxEvent.class);
         verify(repo, times(1)).save(captor.capture());
-        verify(serializer, times(1)).toJson(req);
+        verify(serializer, times(1)).toMap(req);
 
         WorkloadOutboxEvent saved = captor.getValue();
         assertNotNull(saved);
@@ -68,7 +69,7 @@ class WorkloadOutboxServiceTest {
         assertEquals(0, saved.getAttempts());
         assertEquals(aggregateId, saved.getAggregateId());
         assertEquals(txId, saved.getTransactionId());
-        assertEquals("{\"ok\":true}", saved.getPayloadJson());
+        assertEquals(Map.of("ok", true), saved.getPayload());
         assertEquals(error, saved.getLastError());
 
         assertNotNull(saved.getCreatedAt());

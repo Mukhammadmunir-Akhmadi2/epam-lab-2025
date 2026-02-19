@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -50,7 +49,7 @@ class WorkloadServiceClientImplTest {
         KafkaTemplate<String, TrainerWorkloadRequestDto> kafkaTemplate = mock(KafkaTemplate.class);
 
         when(headersProvider.currentTransactionId()).thenReturn("tx-1");
-        when(headersProvider.currentAuthorizationValue()).thenReturn("Bearer abc");
+        when(headersProvider.innerServerAuthorizationValue()).thenReturn("Bearer abc");
 
         // mock send result (so .get(2s) returns successfully)
         RecordMetadata meta = mock(RecordMetadata.class);
@@ -96,7 +95,7 @@ class WorkloadServiceClientImplTest {
         KafkaTemplate<String, TrainerWorkloadRequestDto> kafkaTemplate = mock(KafkaTemplate.class);
 
         when(headersProvider.currentTransactionId()).thenReturn("tx-1");
-        when(headersProvider.currentAuthorizationValue()).thenReturn("Bearer abc");
+        when(headersProvider.innerServerAuthorizationValue()).thenReturn("Bearer abc");
 
         // future completes exceptionally, so .get(2s) throws ExecutionException
         CompletableFuture<SendResult<String, TrainerWorkloadRequestDto>> failed = new CompletableFuture<>();

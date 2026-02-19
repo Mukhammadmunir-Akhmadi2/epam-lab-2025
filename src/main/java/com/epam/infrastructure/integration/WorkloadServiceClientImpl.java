@@ -33,7 +33,7 @@ public class WorkloadServiceClientImpl implements WorkloadServiceClient {
     public void send(TrainerWorkloadRequestDto req) {
         String key = req.getTrainerUsername();
         String txId = headersProvider.currentTransactionId();
-        String auth = headersProvider.currentAuthorizationValue();
+        String auth = headersProvider.innerServerAuthorizationValue();
 
         Message<TrainerWorkloadRequestDto> message = MessageBuilder
                 .withPayload(req)

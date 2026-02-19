@@ -42,7 +42,7 @@ public class WorkloadOutboxService implements WorkloadOutboxPort {
         event.setNextAttemptAt(now.plusSeconds(5));
         event.setTransactionId(txId);
         event.setAggregateId(aggregateId);
-        event.setPayloadJson(serializer.toJson(req));
+        event.setPayload(serializer.toMap(req));
         event.setLastError(error);
 
         event = repo.save(event);

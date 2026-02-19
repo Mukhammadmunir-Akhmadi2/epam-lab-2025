@@ -15,6 +15,7 @@ import org.springframework.messaging.Message;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,15 +62,15 @@ class WorkloadOutboxPublisherTest {
         e.setWoeId("id-1");
         e.setAttempts(0);
         e.setTransactionId("tx-1");
-        e.setPayloadJson("{\"x\":1}");
+        e.setPayload(Map.of("x", 1));
 
         when(repo.findBatchForRetry(any(LocalDateTime.class))).thenReturn(List.of(e));
 
         TrainerWorkloadRequestDto dto = new TrainerWorkloadRequestDto();
         dto.setTrainerUsername("john");
 
-        when(serializer.fromJson(e.getPayloadJson(), TrainerWorkloadRequestDto.class)).thenReturn(dto);
-        when(headersProvider.currentAuthorizationValue()).thenReturn("Bearer abc");
+        when(serializer.fromMap(e.getPayload(), TrainerWorkloadRequestDto.class)).thenReturn(dto);
+        when(headersProvider.innerServerAuthorizationValue()).thenReturn("Bearer abc");
 
         // mock kafka result
         RecordMetadata meta = mock(RecordMetadata.class);
@@ -88,8 +89,8 @@ class WorkloadOutboxPublisherTest {
         publisher.publishBatch();
 
         verify(repo).findBatchForRetry(any(LocalDateTime.class));
-        verify(serializer).fromJson(e.getPayloadJson(), TrainerWorkloadRequestDto.class);
-        verify(headersProvider).currentAuthorizationValue();
+        verify(serializer).fromMap(e.getPayload(), TrainerWorkloadRequestDto.class);
+        verify(headersProvider).innerServerAuthorizationValue();
 
         ArgumentCaptor<Message<TrainerWorkloadRequestDto>> msgCaptor = ArgumentCaptor.forClass(Message.class);
         verify(kafkaTemplate).send(msgCaptor.capture());
@@ -110,15 +111,15 @@ class WorkloadOutboxPublisherTest {
         e.setWoeId("id-2");
         e.setAttempts(3);
         e.setTransactionId("tx-2");
-        e.setPayloadJson("{\"x\":2}");
+        e.setPayload(Map.of("x", 2));
 
         when(repo.findBatchForRetry(any(LocalDateTime.class))).thenReturn(List.of(e));
 
         TrainerWorkloadRequestDto dto = new TrainerWorkloadRequestDto();
         dto.setTrainerUsername("john");
 
-        when(serializer.fromJson(e.getPayloadJson(), TrainerWorkloadRequestDto.class)).thenReturn(dto);
-        when(headersProvider.currentAuthorizationValue()).thenReturn("Bearer abc");
+        when(serializer.fromMap(e.getPayload(), TrainerWorkloadRequestDto.class)).thenReturn(dto);
+        when(headersProvider.innerServerAuthorizationValue()).thenReturn("Bearer abc");
 
         CompletableFuture<SendResult<String, TrainerWorkloadRequestDto>> failed = new CompletableFuture<>();
         failed.completeExceptionally(new RuntimeException("down"));

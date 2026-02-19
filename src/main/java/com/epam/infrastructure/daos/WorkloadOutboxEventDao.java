@@ -2,13 +2,26 @@ package com.epam.infrastructure.daos;
 
 import com.epam.infrastructure.enums.OutboxEventType;
 import com.epam.infrastructure.enums.OutboxStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -62,9 +75,9 @@ public class WorkloadOutboxEventDao {
     @Column(name = "aggregate_id", nullable = false, length = 64)
     private String aggregateId;
 
-    @Lob
-    @Column(name = "payload_json", nullable = false)
-    private String payloadJson;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "payload_json")
+    private Map<String, Object> payload;
 
     @Column(name = "last_error", length = 1000)
     private String lastError;

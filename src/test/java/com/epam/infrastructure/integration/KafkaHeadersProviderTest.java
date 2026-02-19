@@ -43,7 +43,7 @@ class KafkaHeadersProviderTest {
 
         KafkaHeadersProvider provider = new KafkaHeadersProvider(tokenService);
 
-        String auth = provider.currentAuthorizationValue();
+        String auth = provider.innerServerAuthorizationValue();
 
         assertEquals("Bearer abc.def.ghi", auth);
         verify(tokenService, times(1)).issueServiceToken();
