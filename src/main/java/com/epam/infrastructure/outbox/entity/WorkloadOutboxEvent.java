@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -34,6 +35,6 @@ public class WorkloadOutboxEvent {
     @NotBlank
     private String aggregateId;
     @NotBlank
-    private String payloadJson;
+    private Map<String, Object> payload;
     private String lastError;
 }

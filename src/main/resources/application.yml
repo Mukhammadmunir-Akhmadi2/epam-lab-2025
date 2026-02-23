@@ -29,6 +29,9 @@ app:
       file: src/main/resources/bruteforce.json
       max-attempts: 3
       ban-duration-minutes: 5
+  kafka:
+    topics:
+      workload-events: trainer.workload.events
 
 server:
   port: 0
@@ -36,6 +39,19 @@ server:
 spring:
   application:
     name: training-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      properties:
+        max.block.ms: 2000
+        request.timeout.ms: 2000
+        delivery.timeout.ms: 5000
+        metadata.max.age.ms: 3000
+    properties:
+      spring.json.add.type.headers: false
 
 eureka:
   client:

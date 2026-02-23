@@ -3,6 +3,7 @@ package com.epam.infrastructure.outbox;
 import com.epam.infrastructure.dtos.TrainerWorkloadRequestDto;
 import com.epam.infrastructure.enums.OutboxEventType;
 import com.epam.infrastructure.enums.OutboxStatus;
+import com.epam.infrastructure.logging.TransactionIdFilter;
 import com.epam.infrastructure.outbox.entity.WorkloadOutboxEvent;
 import com.epam.infrastructure.outbox.util.OutboxSerializer;
 import com.epam.infrastructure.repository.JpaWorkloadOutboxRepository;
@@ -12,6 +13,7 @@ import org.slf4j.MDC;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -42,11 +44,11 @@ class WorkloadOutboxServiceTest {
         String error = "initial error";
         String txId = "tx-123";
 
-        MDC.put("transactionId", txId);
+        // FIX: use same key as production code
+        MDC.put(TransactionIdFilter.TRANSACTION_ID_HEADER, txId);
 
-        when(serializer.toJson(req)).thenReturn("{\"ok\":true}");
+        when(serializer.toMap(req)).thenReturn(Map.of("ok", true));
 
-        // emulate DB-generated id on save
         when(repo.save(any(WorkloadOutboxEvent.class))).thenAnswer(inv -> {
             WorkloadOutboxEvent e = inv.getArgument(0);
             e.setWoeId("11111111-1111-1111-1111-111111111111");
@@ -57,7 +59,7 @@ class WorkloadOutboxServiceTest {
 
         ArgumentCaptor<WorkloadOutboxEvent> captor = ArgumentCaptor.forClass(WorkloadOutboxEvent.class);
         verify(repo, times(1)).save(captor.capture());
-        verify(serializer, times(1)).toJson(req);
+        verify(serializer, times(1)).toMap(req);
 
         WorkloadOutboxEvent saved = captor.getValue();
         assertNotNull(saved);
@@ -67,13 +69,12 @@ class WorkloadOutboxServiceTest {
         assertEquals(0, saved.getAttempts());
         assertEquals(aggregateId, saved.getAggregateId());
         assertEquals(txId, saved.getTransactionId());
-        assertEquals("{\"ok\":true}", saved.getPayloadJson());
+        assertEquals(Map.of("ok", true), saved.getPayload());
         assertEquals(error, saved.getLastError());
 
         assertNotNull(saved.getCreatedAt());
         assertNotNull(saved.getNextAttemptAt());
 
-        // nextAttemptAt should be createdAt + 5 seconds (allow tiny clock drift)
         long diffSeconds = Duration.between(saved.getCreatedAt(), saved.getNextAttemptAt()).getSeconds();
         assertEquals(5, diffSeconds);
     }
@@ -127,8 +128,6 @@ class WorkloadOutboxServiceTest {
         assertEquals(OutboxStatus.RETRY, e.getStatus());
         assertNotNull(e.getNextAttemptAt());
 
-        // attempts=1 => backoff 5s
-        // nextAttemptAt should be ~ now + 5s (allow test runtime drift)
         long secondsFromBefore = Duration.between(before, e.getNextAttemptAt()).getSeconds();
         long secondsFromAfter = Duration.between(after, e.getNextAttemptAt()).getSeconds();
         assertTrue(secondsFromBefore >= 4 && secondsFromBefore <= 6, "nextAttemptAt should be about now+5s");
@@ -158,7 +157,6 @@ class WorkloadOutboxServiceTest {
         assertEquals("final error", e.getLastError());
 
         assertNotNull(e.getNextAttemptAt());
-        // should be now + 10 years (allow small drift)
         assertTrue(e.getNextAttemptAt().isAfter(before.plusYears(9)), "nextAttemptAt should be far in the future");
         assertTrue(e.getNextAttemptAt().isAfter(after.plusYears(9)), "nextAttemptAt should be far in the future");
 
