@@ -10,10 +10,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,5 +67,24 @@ class TrainingQueryServiceImplTest {
         assertEquals("Morning Cardio", result.get(0).getTrainingName());
         verify(trainingQueryRepository, times(1))
                 .findTrainingsByTrainerUsernameWithFilters("trainer1", null, null, null);
+    }
+
+    @Test
+    void hasTrainerConflict_shouldReturnTrue() {
+
+        when(trainingQueryRepository.existsConflictForTrainer(
+                any(), any(), any()))
+                .thenReturn(true);
+
+        boolean result = trainingQueryService.hasTrainerConflict(
+                "trainer1",
+                LocalDateTime.now(),
+                60
+        );
+
+        assertTrue(result);
+
+        verify(trainingQueryRepository)
+                .existsConflictForTrainer(any(), any(), any());
     }
 }

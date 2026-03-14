@@ -29,7 +29,7 @@ public class AppConfig {
     }
 
     @Bean
-    @Profile("local")
+    @Profile({"local", "stg"})
     public CommandLineRunner trainingTypeInitializer(TrainingTypeRepository trainingTypeRepository) {
         return args -> {
             for (TrainingTypeEnum typeEnum : TrainingTypeEnum.values()) {
@@ -47,7 +47,7 @@ public class AppConfig {
     }
 
     @Bean
-    @Profile("local")
+    @Profile({"local", "stg"})
     public CommandLineRunner adminInitializer(
             JpaBaseUserRepository userRepository,
             JpaRoleRepository roleRepository,

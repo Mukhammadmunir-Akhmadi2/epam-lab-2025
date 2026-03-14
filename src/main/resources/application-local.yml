@@ -13,6 +13,11 @@ hibernate:
     auto: update
   highlight_sql: true
 
+app:
+  kafka:
+    topics:
+      workload-events: trainer.workload.events
+
 logging:
   level:
     root: info

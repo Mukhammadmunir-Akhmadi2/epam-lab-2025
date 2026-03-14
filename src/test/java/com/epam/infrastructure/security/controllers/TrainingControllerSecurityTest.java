@@ -107,7 +107,7 @@ class TrainingControllerSecurityTest {
         mockMvc.perform(post("/trainings/trainee/user/trainer/trainer1")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test

@@ -8,6 +8,11 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
+app:
+  kafka:
+    topics:
+      workload-events: trainer.workload.events
+
 hibernate:
   hbm2ddl:
     auto: create-drop

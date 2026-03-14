@@ -29,9 +29,6 @@ app:
       file: src/main/resources/bruteforce.json
       max-attempts: 3
       ban-duration-minutes: 5
-  kafka:
-    topics:
-      workload-events: trainer.workload.events
 
 server:
   port: 0
@@ -40,6 +37,8 @@ spring:
   application:
     name: training-service
   kafka:
+    admin:
+      auto-create: true
     bootstrap-servers: localhost:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer

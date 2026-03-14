@@ -168,4 +168,59 @@ class JpaTrainingQueryRepositoryTest {
 
         assertEquals(1, trainings.size());
     }
+
+    @Test
+    void existsConflictForTrainer_shouldReturnTrue_whenTimeOverlaps() {
+
+        LocalDateTime newStart = training1.getDate().plusMinutes(30);
+        LocalDateTime newEnd = newStart.plusMinutes(60);
+
+        boolean conflict = trainingQueryRepository.existsConflictForTrainer(
+                trainer.getUsername(),
+                newStart,
+                newEnd
+        );
+
+        assertTrue(conflict);
+    }
+
+    @Test
+    void existsConflictForTrainer_shouldReturnFalse_whenNoOverlap() {
+
+        LocalDateTime newStart = training2.getDate().plusHours(2);
+        LocalDateTime newEnd = newStart.plusMinutes(30);
+
+        boolean conflict = trainingQueryRepository.existsConflictForTrainer(
+                trainer.getUsername(),
+                newStart,
+                newEnd
+        );
+
+        assertFalse(conflict);
+    }
+
+    @Test
+    void existsConflictForTrainer_shouldReturnFalse_forDifferentTrainer() {
+
+        Trainer anotherTrainer = new Trainer();
+        anotherTrainer.setUsername("trainer_" + UUID.randomUUID());
+        anotherTrainer.setFirstName("Bob");
+        anotherTrainer.setLastName("Lee");
+        anotherTrainer.setPassword("pass");
+        anotherTrainer.setIsActive(true);
+        anotherTrainer.setSpecialization(trainingType);
+
+        anotherTrainer = trainerRepository.save(anotherTrainer);
+
+        LocalDateTime newStart = training1.getDate();
+        LocalDateTime newEnd = newStart.plusMinutes(60);
+
+        boolean conflict = trainingQueryRepository.existsConflictForTrainer(
+                anotherTrainer.getUsername(),
+                newStart,
+                newEnd
+        );
+
+        assertFalse(conflict);
+    }
 }
