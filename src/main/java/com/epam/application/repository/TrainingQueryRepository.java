@@ -4,6 +4,7 @@ import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.model.Training;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TrainingQueryRepository {
@@ -20,4 +21,5 @@ public interface TrainingQueryRepository {
             LocalDate to,
             String traineeName);
 
+    boolean existsConflictForTrainer(String trainerUsername, LocalDateTime newStart, LocalDateTime newEnd);
 }

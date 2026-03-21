@@ -1,6 +1,7 @@
 package com.epam.application.services.impl;
 
 import com.epam.application.exceptions.ResourceNotFoundException;
+import com.epam.application.exceptions.TrainerScheduleConflictException;
 import com.epam.application.repository.TrainingRepository;
 import com.epam.application.services.TrainingService;
 import com.epam.application.tx.AfterCommitExecutor;
@@ -26,10 +27,24 @@ public class TrainingServiceImpl implements TrainingService {
     private final AfterCommitExecutor afterCommitExecutor;
     private final WorkloadEventPublisher workloadPublisher;
 
+    private final TrainingQueryServiceImpl trainingQueryService;
+
     @Transactional
     @Override
     public Training createTraining(@Valid Training training) {
         training.setIsActive(true);
+
+        if (trainingQueryService
+                .hasTrainerConflict(
+                        training.getTrainer().getUsername(),
+                        training.getDate(),
+                        training.getDuration()))
+        {
+            throw new TrainerScheduleConflictException(
+                    "Trainer already has a training at this time"
+            );
+        }
+
         Training saved = trainingRepository.save(training);
 
         Training db = trainingRepository.findById(saved.getTrainingId()).get();

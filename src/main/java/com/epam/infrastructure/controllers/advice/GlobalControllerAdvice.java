@@ -1,12 +1,11 @@
 package com.epam.infrastructure.controllers.advice;
 
 import com.epam.application.exceptions.ResourceNotFoundException;
+import com.epam.application.exceptions.TrainerScheduleConflictException;
 import com.epam.application.exceptions.UnauthorizedAccess;
 import com.epam.infrastructure.utils.ProblemDetailUtil;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.log4j.Log4j2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +53,14 @@ public class GlobalControllerAdvice {
 
         ProblemDetail problem = ProblemDetailUtil.createProblemDetail(HttpStatus.BAD_REQUEST, "Illegal Argument", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    }
+
+    @ExceptionHandler(TrainerScheduleConflictException.class)
+    public ResponseEntity<ProblemDetail> handleConflict(TrainerScheduleConflictException ex) {
+        log.warn("Trainer schedule conflict: {}", ex.getMessage(), ex);
+
+        ProblemDetail problem = ProblemDetailUtil.createProblemDetail(HttpStatus.CONFLICT, "Trainer schedule conflict", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

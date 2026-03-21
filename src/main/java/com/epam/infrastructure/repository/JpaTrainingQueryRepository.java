@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -87,6 +88,36 @@ public class JpaTrainingQueryRepository implements TrainingQueryRepository {
             predicate = cb.and(predicate, cb.lessThanOrEqualTo(trainingRoot.get("date"), to.atTime(23, 59, 59)));
         }
         return predicate;
+    }
+
+
+    @Override
+    public boolean existsConflictForTrainer(String trainerUsername, LocalDateTime newStart, LocalDateTime newEnd) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TrainingDao> cq = cb.createQuery(TrainingDao.class);
+
+        Root<TrainingDao> root = cq.from(TrainingDao.class);
+
+        Predicate trainerMatch =
+                cb.equal(root.get("trainer").get("username"), trainerUsername);
+
+        Predicate possibleOverlap =
+                cb.lessThan(root.get("date"), newEnd);
+
+        cq.select(root).where(cb.and(trainerMatch, possibleOverlap));
+
+        List<TrainingDao> candidates =
+                entityManager.createQuery(cq).getResultList();
+
+        return candidates.stream().anyMatch(existing -> {
+
+            LocalDateTime existingStart = existing.getDate();
+            LocalDateTime existingEnd = existingStart.plusMinutes(existing.getDuration());
+
+            return existingStart.isBefore(newEnd) &&
+                    existingEnd.isAfter(newStart);
+        });
     }
 }
 

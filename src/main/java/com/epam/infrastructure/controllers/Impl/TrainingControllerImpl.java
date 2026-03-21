@@ -17,6 +17,7 @@ import com.epam.model.Trainer;
 import com.epam.model.Training;
 import com.epam.model.TrainingType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,7 +46,7 @@ public class TrainingControllerImpl implements TrainingController {
         TrainingType trainingType = trainingTypeService.getTrainingType(request.getType());
         trainingService.createTraining(trainingMapper.toModel(trainee, trainer, trainingType, request));
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Override

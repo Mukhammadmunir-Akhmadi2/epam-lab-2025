@@ -2,6 +2,7 @@ package com.epam.infrastructure.dtos;
 
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class TrainingDto {
     @Schema(description = "Training type", example = "CARDIO")
     private TrainingTypeEnum type;
     @NotNull
+    @Min(value = 10)
     @Schema(description = "Training duration in minutes", example = "60")
     private Integer duration;
 }
