@@ -8,6 +8,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -19,7 +20,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class WorkloadServiceClientImpl implements WorkloadServiceClient {
+@Profile({"local", "stg", "test", "prod"})
+public class WorkloadServiceClientKafka implements WorkloadServiceClient {
 
     @Value("${app.kafka.topics.workload-events}")
     private String topic;

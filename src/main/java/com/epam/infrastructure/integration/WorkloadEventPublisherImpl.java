@@ -1,6 +1,7 @@
 package com.epam.infrastructure.integration;
 
 import com.epam.application.port.WorkloadEventPublisher;
+import com.epam.application.port.WorkloadServiceClient;
 import com.epam.infrastructure.enums.ActionType;
 import com.epam.infrastructure.mappers.TrainerWorkloadEventMapper;
 import com.epam.model.Training;
@@ -15,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WorkloadEventPublisherImpl implements WorkloadEventPublisher {
 
-    private final WorkloadServiceClientImpl workloadGateway;
+    private final WorkloadServiceClient workloadGateway;
     private final TrainerWorkloadEventMapper mapper;
 
     @Override

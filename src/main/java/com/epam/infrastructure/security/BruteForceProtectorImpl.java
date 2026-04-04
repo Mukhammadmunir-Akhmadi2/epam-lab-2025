@@ -32,6 +32,8 @@ public class BruteForceProtectorImpl implements BruteForceProtector {
     @Value("${app.security.brute-force-protection.file}")
     private String storagePath;
 
+    private String fileName = "bruteforce.json";
+
     private final ObjectMapper mapper = new ObjectMapper();
 
     private final Map<String, LoginAttempt> attempts = new ConcurrentHashMap<>();
@@ -83,7 +85,7 @@ public class BruteForceProtectorImpl implements BruteForceProtector {
     @PostConstruct
     private void load() {
         try {
-            File storage = new File(storagePath);
+            File storage = new File(storagePath + "/" +fileName);
             if (!storage.exists()) return;
             ObjectMapper mapper = new ObjectMapper();
             Map<String, LoginAttempt> loaded = mapper.readValue(storage, new TypeReference<>() {});
@@ -99,9 +101,9 @@ public class BruteForceProtectorImpl implements BruteForceProtector {
     @PreDestroy
     private void save() {
         try {
-            File storage = new File(storagePath);
+            File storage = new File(storagePath + "/" +fileName);
 
-            mapper.writeValue(storage, attempts);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(storage, attempts);
 
             LOGGER.info("BruteForceProtectorService saved {} records to storage", attempts.size());
         } catch (NullPointerException ex) {

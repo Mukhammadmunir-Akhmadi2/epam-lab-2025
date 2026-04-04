@@ -20,17 +20,17 @@ import static org.mockito.Mockito.*;
 
 class WorkloadServiceClientImplTest {
 
-    private static WorkloadServiceClientImpl newSvc(
+    private static WorkloadServiceClientKafka newSvc(
             WorkloadOutboxPort outbox,
             KafkaHeadersProvider headersProvider,
             KafkaTemplate<String, TrainerWorkloadRequestDto> kafkaTemplate,
             String topic
     ) {
-        WorkloadServiceClientImpl svc = new WorkloadServiceClientImpl(outbox, headersProvider, kafkaTemplate);
+        WorkloadServiceClientKafka svc = new WorkloadServiceClientKafka(outbox, headersProvider, kafkaTemplate);
 
         // @Value won't run in pure unit tests -> set via reflection
         try {
-            Field f = WorkloadServiceClientImpl.class.getDeclaredField("topic");
+            Field f = WorkloadServiceClientKafka.class.getDeclaredField("topic");
             f.setAccessible(true);
             f.set(svc, topic);
         } catch (Exception e) {
@@ -66,7 +66,7 @@ class WorkloadServiceClientImplTest {
 
         when(kafkaTemplate.send(any(Message.class))).thenReturn(okFuture);
 
-        WorkloadServiceClientImpl svc = newSvc(outbox, headersProvider, kafkaTemplate, "trainer.workload.events");
+        WorkloadServiceClientKafka svc = newSvc(outbox, headersProvider, kafkaTemplate, "trainer.workload.events");
 
         TrainerWorkloadRequestDto req = new TrainerWorkloadRequestDto();
         req.setTrainerUsername("john");
@@ -102,7 +102,7 @@ class WorkloadServiceClientImplTest {
         failed.completeExceptionally(new RuntimeException("kafka down"));
         when(kafkaTemplate.send(any(Message.class))).thenReturn(failed);
 
-        WorkloadServiceClientImpl svc = newSvc(outbox, headersProvider, kafkaTemplate, "trainer.workload.events");
+        WorkloadServiceClientKafka svc = newSvc(outbox, headersProvider, kafkaTemplate, "trainer.workload.events");
 
         TrainerWorkloadRequestDto req = new TrainerWorkloadRequestDto();
         req.setTrainerUsername("john");
@@ -126,7 +126,7 @@ class WorkloadServiceClientImplTest {
         @SuppressWarnings("unchecked")
         KafkaTemplate<String, TrainerWorkloadRequestDto> kafkaTemplate = mock(KafkaTemplate.class);
 
-        WorkloadServiceClientImpl svc = newSvc(outbox, headersProvider, kafkaTemplate, "trainer.workload.events");
+        WorkloadServiceClientKafka svc = newSvc(outbox, headersProvider, kafkaTemplate, "trainer.workload.events");
 
         TrainerWorkloadRequestDto req = new TrainerWorkloadRequestDto();
         req.setTrainerUsername("john");
@@ -136,7 +136,7 @@ class WorkloadServiceClientImplTest {
         RuntimeException ex = new RuntimeException("service down");
 
         // method name is sendFallback now (NOT "fallback")
-        Method m = WorkloadServiceClientImpl.class
+        Method m = WorkloadServiceClientKafka.class
                 .getDeclaredMethod("sendFallback", TrainerWorkloadRequestDto.class, Throwable.class);
         m.setAccessible(true);
 

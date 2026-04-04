@@ -1,0 +1,12 @@
+{
+  "John.Doe1" : {
+    "username" : "John.Doe1",
+    "attempts" : 1,
+    "banStartTime" : null
+  },
+  "john_doe" : {
+    "username" : "john_doe",
+    "attempts" : 2,
+    "banStartTime" : null
+  }
+}

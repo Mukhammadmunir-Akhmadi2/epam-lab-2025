@@ -9,6 +9,7 @@ import com.epam.infrastructure.repository.JpaWorkloadOutboxRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.kafka.support.SendResult;
@@ -24,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 @Log4j2
 @Component
 @RequiredArgsConstructor
+@Profile({"local", "stg", "test", "prod"})
 public class WorkloadOutboxPublisher {
 
     private final JpaWorkloadOutboxRepository repo;

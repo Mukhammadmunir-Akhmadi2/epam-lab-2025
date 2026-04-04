@@ -12,6 +12,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
+@Profile({"local", "stg", "test", "prod"})
 public class JpaTrainingQueryRepository implements TrainingQueryRepository {
 
     @PersistenceContext

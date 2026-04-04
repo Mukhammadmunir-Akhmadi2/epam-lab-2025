@@ -1,12 +1,17 @@
 package com.epam.infrastructure.config;
 
+import com.epam.application.repository.RoleRepository;
 import com.epam.application.repository.TrainingTypeRepository;
+import com.epam.infrastructure.enums.RoleEnum;
 import com.epam.infrastructure.enums.TrainingTypeEnum;
 import com.epam.infrastructure.logging.TransactionIdFilter;
 import com.epam.infrastructure.repository.JpaBaseUserRepository;
 import com.epam.infrastructure.repository.JpaRoleRepository;
+import com.epam.model.Role;
 import com.epam.model.TrainingType;
 import com.epam.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -21,6 +26,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class AppConfig {
 
     @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper()
+                .registerModule(new JavaTimeModule());
+    }
+
+    @Bean
     public FilterRegistrationBean<TransactionIdFilter> txIdFilter(TransactionIdFilter filter) {
         FilterRegistrationBean<TransactionIdFilter> reg = new FilterRegistrationBean<>(filter);
         reg.setOrder(1);
@@ -29,7 +40,7 @@ public class AppConfig {
     }
 
     @Bean
-    @Profile({"local", "stg"})
+    @Profile({"local", "stg", "dev", "prod"})
     public CommandLineRunner trainingTypeInitializer(TrainingTypeRepository trainingTypeRepository) {
         return args -> {
             for (TrainingTypeEnum typeEnum : TrainingTypeEnum.values()) {
@@ -47,7 +58,25 @@ public class AppConfig {
     }
 
     @Bean
-    @Profile({"local", "stg"})
+    @Profile("dev")
+    public CommandLineRunner roleInitializer(RoleRepository roleRepository) {
+        return args -> {
+            for (RoleEnum roleEnum : RoleEnum.values()) {
+                roleRepository.findByName(roleEnum).ifPresentOrElse(
+                        existing -> log.info("Role {} already exists. Skipping creation.", roleEnum),
+                        () -> {
+                            Role role = new Role();
+                            role.setRole(roleEnum);
+                            roleRepository.save(role);
+                            log.info("Saved role: {}", roleEnum);
+                        }
+                );
+            }
+        };
+    }
+
+    @Bean
+    @Profile({"local", "stg", "prod"})
     public CommandLineRunner adminInitializer(
             JpaBaseUserRepository userRepository,
             JpaRoleRepository roleRepository,

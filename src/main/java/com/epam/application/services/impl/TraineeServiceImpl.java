@@ -5,10 +5,10 @@ import com.epam.application.generators.PasswordGenerator;
 import com.epam.application.generators.UsernameGenerator;
 import com.epam.application.repository.BaseUserRepository;
 import com.epam.application.repository.TraineeRepository;
+import com.epam.application.repository.TrainingRepository;
 import com.epam.application.services.TraineeService;
 import com.epam.application.tx.AfterCommitExecutor;
 import com.epam.application.port.WorkloadEventPublisher;
-import com.epam.infrastructure.repository.JpaTrainingRepository;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
 import com.epam.model.Training;
@@ -32,7 +32,7 @@ import java.util.List;
 public class TraineeServiceImpl implements TraineeService {
     private final TraineeRepository traineeRepository;
     private final BaseUserRepository baseUserRepository;
-    private final JpaTrainingRepository trainingRepository;
+    private final TrainingRepository trainingRepository;
 
     private final UsernameGenerator usernameGenerator;
     private final PasswordGenerator passwordGenerator;

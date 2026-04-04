@@ -3,6 +3,7 @@ package com.epam.infrastructure.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -14,6 +15,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
+@Profile({"local", "stg", "test", "prod"})
 public class JpaConfig {
 
     @Value("${spring.custom-datasource.url}")
@@ -22,7 +24,7 @@ public class JpaConfig {
     @Value("${spring.custom-datasource.username}")
     private String dbUser;
 
-    @Value("${spring.custom-datasource.password:}") // optional for H2
+    @Value("${spring.custom-datasource.password:}")
     private String dbPassword;
 
     @Value("${spring.custom-datasource.driver-class-name}")
@@ -72,7 +74,7 @@ public class JpaConfig {
     private Properties jpaProperties() {
         Properties properties = new Properties();
 
-        properties.setProperty("hibernate.hbm2ddl.auto", ddl);
+        properties.setProperty("hib.ernate.hbm2ddl.auto", ddl);
         properties.setProperty("hibernate.highlight_sql", highlightSql);
 
         return properties;

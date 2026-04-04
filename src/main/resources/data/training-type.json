@@ -1,0 +1,22 @@
+{
+  "6622ead3-0446-4988-97b4-4f05b0a1413d" : {
+    "trainingTypeId" : "6622ead3-0446-4988-97b4-4f05b0a1413d",
+    "trainingType" : "STRENGTH"
+  },
+  "e4e50593-9afb-4bd5-b382-0fb4d906245e" : {
+    "trainingTypeId" : "e4e50593-9afb-4bd5-b382-0fb4d906245e",
+    "trainingType" : "PILATES"
+  },
+  "c7cfe361-f9bd-452e-800d-0f78b3a7c1df" : {
+    "trainingTypeId" : "c7cfe361-f9bd-452e-800d-0f78b3a7c1df",
+    "trainingType" : "CARDIO"
+  },
+  "5aa2f414-effb-4260-b8ae-fdce7862e64e" : {
+    "trainingTypeId" : "5aa2f414-effb-4260-b8ae-fdce7862e64e",
+    "trainingType" : "YOGA"
+  },
+  "d6839d52-dcf9-4b6d-a50c-ae0ff40ea312" : {
+    "trainingTypeId" : "d6839d52-dcf9-4b6d-a50c-ae0ff40ea312",
+    "trainingType" : "CROSSFIT"
+  }
+}

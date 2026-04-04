@@ -9,6 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
+@Profile({"local", "stg", "test", "prod"})
 public class JpaTraineeRepository implements TraineeRepository {
 
     private final TraineeMapper traineeMapper;

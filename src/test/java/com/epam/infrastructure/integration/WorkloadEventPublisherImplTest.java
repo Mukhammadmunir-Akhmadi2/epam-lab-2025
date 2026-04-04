@@ -18,7 +18,7 @@ class WorkloadEventPublisherImplTest {
 
     @Test
     void publishTrainingAdded_shouldMapAddAndSend() {
-        WorkloadServiceClientImpl gateway = mock(WorkloadServiceClientImpl.class);
+        WorkloadServiceClientKafka gateway = mock(WorkloadServiceClientKafka.class);
         TrainerWorkloadEventMapper mapper = mock(TrainerWorkloadEventMapper.class);
 
         WorkloadEventPublisherImpl publisher = new WorkloadEventPublisherImpl(gateway, mapper);
@@ -37,7 +37,7 @@ class WorkloadEventPublisherImplTest {
 
     @Test
     void publishTrainingDeleted_shouldMapDeleteAndSend() {
-        WorkloadServiceClientImpl gateway = mock(WorkloadServiceClientImpl.class);
+        WorkloadServiceClientKafka gateway = mock(WorkloadServiceClientKafka.class);
         TrainerWorkloadEventMapper mapper = mock(TrainerWorkloadEventMapper.class);
 
         WorkloadEventPublisherImpl publisher = new WorkloadEventPublisherImpl(gateway, mapper);
@@ -56,7 +56,7 @@ class WorkloadEventPublisherImplTest {
 
     @Test
     void publishTrainingsDeleted_shouldSendTwice_andMapTwice() {
-        WorkloadServiceClientImpl gateway = mock(WorkloadServiceClientImpl.class);
+        WorkloadServiceClientKafka gateway = mock(WorkloadServiceClientKafka.class);
         TrainerWorkloadEventMapper mapper = mock(TrainerWorkloadEventMapper.class);
 
         WorkloadEventPublisherImpl publisher = new WorkloadEventPublisherImpl(gateway, mapper);

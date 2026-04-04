@@ -6,6 +6,7 @@ import com.epam.infrastructure.mappers.WorkloadOutboxMapper;
 import com.epam.infrastructure.outbox.entity.WorkloadOutboxEvent;
 import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
+@Profile({"local", "stg", "test", "prod"})
 public class JpaWorkloadOutboxRepository implements WorkloadOutboxRepository {
 
     private final WorkloadOutboxMapper mapper;

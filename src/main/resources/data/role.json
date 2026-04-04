@@ -1,0 +1,14 @@
+{
+  "e8dea873-1b26-40a3-a092-e45bf7a6b2f9" : {
+    "roleId" : "e8dea873-1b26-40a3-a092-e45bf7a6b2f9",
+    "role" : "TRAINER"
+  },
+  "2d1f9e8b-f6e8-4e9b-a3f8-ed65bff93521" : {
+    "roleId" : "2d1f9e8b-f6e8-4e9b-a3f8-ed65bff93521",
+    "role" : "TRAINEE"
+  },
+  "fed1b100-01a3-480d-b945-8cf98183a3d3" : {
+    "roleId" : "fed1b100-01a3-480d-b945-8cf98183a3d3",
+    "role" : "ADMIN"
+  }
+}

@@ -3,7 +3,19 @@ spring:
     activate:
       on-profile: dev
 
+data:
+  folder: ${DATA_FOLDER:src/main/resources/data}
+
 logging:
   level:
     root: info
     org.springframework.security: debug
+
+system:
+  admin:
+    username: admin
+    password: admin
+
+eureka:
+  client:
+    enabled: false

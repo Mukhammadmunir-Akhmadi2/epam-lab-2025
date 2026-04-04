@@ -9,12 +9,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
+@Profile({"local", "stg", "test", "prod"})
 public class JpaTrainerQueryRepository implements TrainerQueryRepository {
 
     @PersistenceContext

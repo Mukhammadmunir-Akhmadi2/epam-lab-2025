@@ -1,0 +1,34 @@
+{
+  "4d4b1dde-d473-4d41-a6c5-180be7602dce" : {
+    "userId" : "4d4b1dde-d473-4d41-a6c5-180be7602dce",
+    "firstName" : "John",
+    "lastName" : "Doe",
+    "username" : "John.Doe1",
+    "password" : "$2a$10$SzJnYZRBZSMRkMwUPnkUj.2JU0hzTamCj10/AvqGH7j36p3yrfO7.",
+    "isActive" : true,
+    "roles" : [ {
+      "roleId" : "2d1f9e8b-f6e8-4e9b-a3f8-ed65bff93521",
+      "role" : "TRAINEE"
+    } ],
+    "dateOfBirth" : [ 1999, 10, 10 ],
+    "address" : "123",
+    "trainers" : [ ],
+    "trainings" : [ ]
+  },
+  "40fc5613-6e7d-410a-a9a0-7c6047d55642" : {
+    "userId" : "40fc5613-6e7d-410a-a9a0-7c6047d55642",
+    "firstName" : "John",
+    "lastName" : "Doe",
+    "username" : "John.Doe",
+    "password" : "$2a$10$pvOt0bQjMK3WdB41TxZetuuSjUoDWYIIJTToKrRcgHiIFlaftxiFO",
+    "isActive" : true,
+    "roles" : [ {
+      "roleId" : "2d1f9e8b-f6e8-4e9b-a3f8-ed65bff93521",
+      "role" : "TRAINEE"
+    } ],
+    "dateOfBirth" : [ 1999, 10, 10 ],
+    "address" : "123",
+    "trainers" : [ ],
+    "trainings" : [ ]
+  }
+}

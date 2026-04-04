@@ -10,6 +10,7 @@ import com.epam.infrastructure.repository.JpaWorkloadOutboxRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.slf4j.MDC;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @Log4j2
 @Service
 @RequiredArgsConstructor
+@Profile({"local", "stg", "test", "prod"})
 public class WorkloadOutboxService implements WorkloadOutboxPort {
 
     private static final int MAX_ATTEMPTS = 10;
